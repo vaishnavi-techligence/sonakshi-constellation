@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "type": "polaroid",
+    "title": "Golden Solo Stage",
+    "era": "Golden 2023",
+    "category": "Performances",
+    "color": "linear-gradient(135deg, #2e1065 0%, #090514 100%)",
+    "emoji": "🎙️🐰",
+    "imageUrl": "https://i.pinimg.com/originals/a0/0b/40/a00b40eb9385b03f0b2f518a221f5795.jpg"
+  },
+  {
+    "id": 2,
+    "type": "scrapbook",
+    "title": "Cozy Studio Session",
+    "era": "Midnight Log 2022",
+    "category": "Studio Moments",
+    "color": "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)",
+    "emoji": "🎧🎼",
+    "imageUrl": "https://i.pinimg.com/736x/21/cf/bd/21cfbd8abcb043c74de30e0600122aee.jpg"
+  },
+  {
+    "id": 3,
+    "type": "note",
+    "title": "Still With You Log",
+    "era": "Rainy Day Comfort 2020",
+    "category": "Comfort Photos",
+    "color": "linear-gradient(135deg, #0c0a27 0%, #060411 100%)",
+    "emoji": "☕🧣",
+    "imageUrl": "https://i.pinimg.com/originals/44/2c/6b/442c6bfbd60351722880c2f82ef6ee06.jpg"
+  },
+  {
+    "id": 4,
+    "type": "polaroid",
+    "title": "Euphoria Flight",
+    "era": "Love Yourself Tour 2019",
+    "category": "BTS Era Photos",
+    "color": "linear-gradient(135deg, #1e3a8a 0%, #0d1b3e 100%)",
+    "emoji": "💜🎈",
+    "imageUrl": "https://i.pinimg.com/originals/3d/8c/b6/3d8cb6a2a0deffc9b6f6fbe07a4a9c67.jpg"
+  },
+  {
+    "id": 5,
+    "type": "scrapbook",
+    "title": "Dynamite Recording",
+    "era": "Dynamite 2020",
+    "category": "Performances",
+    "color": "linear-gradient(135deg, #581c87 0%, #1e1b4b 100%)",
+    "emoji": "☕🧣",
+    "imageUrl": "https://i.pinimg.com/originals/a4/bc/99/a4bc99f9c73e1644cc10b0e50f38b184.jpg"
+  },
+  {
+    "id": 6,
+    "type": "note",
+    "title": "Run BTS Fun",
+    "era": "Run BTS Era",
+    "category": "Funny Memories",
+    "color": "linear-gradient(135deg, #020617 0%, #1e1b4b 100%)",
+    "emoji": "🐰🍿",
+    "imageUrl": "https://i.pinimg.com/originals/eb/95/ab/eb95abc59eb4f39bdfde035777174db2.jpg"
+  },
+  {
+    "id": 7,
+    "type": "polaroid",
+    "title": "Yet To Come Concert",
+    "era": "Busan 2022",
+    "category": "BTS Era Photos",
+    "color": "linear-gradient(135deg, #312e81 0%, #0f172a 100%)",
+    "emoji": "🕺🔥",
+    "imageUrl": "https://i.pinimg.com/originals/4c/83/7d/4c837d383b1a8b9a1a7ee28eb258679f.jpg"
+  },
+  {
+    "id": 8,
+    "type": "scrapbook",
+    "title": "Comfort Winter Days",
+    "era": "Winter Package 2021",
+    "category": "Comfort Photos",
+    "color": "linear-gradient(135deg, #064e3b 0%, #022c22 100%)",
+    "emoji": "🍳🏕️",
+    "imageUrl": "https://i.pinimg.com/originals/26/fb/2f/26fb2fe1f99c1585bc672322303c7340.jpg"
+  },
+  {
+    "id": 9,
+    "type": "note",
+    "title": "Standing Next to You",
+    "era": "Solo Debut 2023",
+    "category": "Performances",
+    "color": "linear-gradient(135deg, #4c1d95 0%, #1e1b4b 100%)",
+    "emoji": "🎩👟",
+    "imageUrl": "https://i.pinimg.com/736x/88/4c/e7/884ce75a0248c8bfa46817fdfb1e8476.jpg"
+  },
+  {
+    "id": 10,
+    "type": "polaroid",
+    "title": "In the SOOP Rest",
+    "era": "Healing 2021",
+    "category": "Comfort Photos",
+    "color": "linear-gradient(135deg, #030712 0%, #1f2937 100%)",
+    "emoji": "🕯️🎨",
+    "imageUrl": "https://i.pinimg.com/originals/d6/90/e1/d690e1f74a0081d39f7278d655f242aa.jpg"
+  },
+  {
+    "id": 11,
+    "type": "polaroid",
+    "title": "Begin Wings Era",
+    "era": "Wings 2016",
+    "category": "BTS Era Photos",
+    "color": "linear-gradient(135deg, #0a0514 0%, #1f2937 100%)",
+    "emoji": "🕯️🎨",
+    "imageUrl": "https://i.pinimg.com/originals/60/a4/a5/60a4a58b688325a7cc38be781eb898df.jpg"
+  },
+  {
+    "id": 12,
+    "type": "polaroid",
+    "title": "Spring Day Memories",
+    "era": "You Never Walk Alone 2017",
+    "category": "BTS Era Photos",
+    "color": "linear-gradient(135deg, #1e0b36 0%, #05030d 100%)",
+    "emoji": "🌸💧",
+    "imageUrl": "https://i.pinimg.com/originals/94/a3/b9/94a3b907c16d56bb5734e5699478f4de.jpg"
+  },
+  {
+    "id": 13,
+    "type": "polaroid",
+    "title": "Time Difference Film",
+    "era": "Photo-Folio 2022",
+    "category": "Favorite Looks",
+    "color": "linear-gradient(135deg, #1e1b4b 0%, #2e1065 100%)",
+    "emoji": "👑🪐",
+    "imageUrl": "https://i.pinimg.com/originals/c7/2d/52/c72d52f6027c81d3ee5071df6bc4bb8e.jpg"
+  },
+  {
+    "id": 14,
+    "type": "polaroid",
+    "title": "Golden Disc Stage",
+    "era": "Awards Season 2021",
+    "category": "Performances",
+    "color": "linear-gradient(135deg, #0c0a27 0%, #1e1b4b 100%)",
+    "emoji": "🕺🔥",
+    "imageUrl": "https://i.pinimg.com/originals/8a/a4/80/8aa4802c63eb1e095b3648fa28f7311c.jpg"
+  },
+  {
+    "id": 15,
+    "type": "polaroid",
+    "title": "My You Recording",
+    "era": "Festa 2022",
+    "category": "Studio Moments",
+    "color": "linear-gradient(135deg, #020617 0%, #030712 100%)",
+    "emoji": "🎧🎹",
+    "imageUrl": "https://i.pinimg.com/originals/26/13/2e/26132ef7c02b993efb5071df052ff37c.jpg"
+  },
+  {
+    "id": 16,
+    "type": "polaroid",
+    "title": "Quiet Midnight Walks",
+    "era": "Comfort 2023",
+    "category": "Comfort Photos",
+    "color": "linear-gradient(135deg, #581c87 0%, #1e3a8a 100%)",
+    "emoji": "🧣🌌",
+    "imageUrl": "https://i.pinimg.com/originals/30/d6/76/30d6768393c5c994f31c5545db2bc0bf.jpg"
+  }
+]

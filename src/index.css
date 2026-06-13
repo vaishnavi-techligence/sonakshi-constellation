@@ -1,0 +1,270 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap');
+
+/* ==========================================
+   THE SECRET LILY GARDEN - CORE DESIGN SYSTEM
+   ========================================== */
+
+:root {
+  /* Colors */
+  --bg-dark: #070710;
+  --bg-twilight: #0d0e26;
+  --bg-garden: #111432;
+  --primary-glow: #e9eaff;
+  --lily-white: #fcfbfa;
+  --lily-glow: rgba(220, 225, 255, 0.85);
+  --gold-accent: #f2e3c6;
+  --gold-glow: rgba(242, 227, 198, 0.4);
+  --purple-accent: #e5ccff;
+  --purple-glow: rgba(229, 204, 255, 0.3);
+  --crystal-blue: #d0f0ff;
+  --crystal-glow: rgba(208, 240, 255, 0.35);
+  --text-primary: #f8f8fc;
+  --text-secondary: #c5c5d3;
+  --text-muted: #8c8c9e;
+
+  /* Typography */
+  --font-serif-display: 'Cinzel', serif;
+  --font-serif-text: 'Playfair Display', serif;
+  --font-sans: 'Montserrat', sans-serif;
+
+  /* Shadows & Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glow-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+}
+
+/* Base resets & behavior */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  cursor: none; /* Hide default cursor to use custom magic particles cursor */
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Typography styles */
+h1, h2, h3 {
+  font-family: var(--font-serif-display);
+  letter-spacing: 0.1em;
+}
+
+p {
+  line-height: 1.8;
+  font-weight: 300;
+}
+
+.serif-quote {
+  font-family: var(--font-serif-text);
+  font-style: italic;
+}
+
+/* Custom Magic Cursor styling */
+.magic-cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--gold-accent);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000000002;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px var(--gold-accent);
+  transition: width 0.15s ease-out, height 0.15s ease-out;
+}
+
+.magic-cursor-circle {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(242, 227, 198, 0.3);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000000000;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease-out, width 0.2s, height 0.2s, background-color 0.2s;
+}
+
+/* Glassmorphism styling */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45), 0 0 15px rgba(255, 255, 255, 0.05);
+}
+
+/* Elegant glowing button */
+.magic-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  border-radius: 30px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.magic-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 60%);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.5s ease;
+}
+
+.magic-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--primary-glow);
+  box-shadow: 0 0 20px rgba(233, 234, 255, 0.35);
+  transform: translateY(-2px);
+}
+
+.magic-btn:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.magic-btn:active {
+  transform: translateY(1px);
+}
+
+/* Keyframe Animations */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.6; transform: scale(1); filter: brightness(1); }
+  50% { opacity: 1; transform: scale(1.03); filter: brightness(1.2); }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes leaf-grow {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes drift {
+  0% { transform: translateX(0); }
+  50% { transform: translateX(15px); }
+  100% { transform: translateX(0); }
+}
+
+/* Global utility classes */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 25s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1.5s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Section styling template */
+.garden-section {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding: 80px 24px;
+}
+
+/* Hide styling files not used in React templates */
+.logo { display: none; }
+.card { display: none; }
+
+.pulse-dot {
+  animation: pulse-slow 1.5s ease-in-out infinite;
+  box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fade-out-down {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(20px); }
+}
