@@ -13,21 +13,33 @@ interface Particle {
 }
 
 export const MagicCursor: React.FC = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [trailingPosition, setTrailingPosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const circleRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const lastEmitRef = useRef<number>(0);
 
+  const posRef = useRef({ x: 0, y: 0 });
+  const trailRef = useRef({ x: 0, y: 0 });
+
   // Track cursor position
   useEffect(() => {
+    // Hidden on touch devices
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+
     const updatePosition = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
+      posRef.current.x = e.clientX;
+      posRef.current.y = e.clientY;
+
+      if (dotRef.current) {
+        dotRef.current.style.left = `${e.clientX}px`;
+        dotRef.current.style.top = `${e.clientY}px`;
+      }
 
       // Emit custom canvas particles
       const now = Date.now();
-      if (now - lastEmitRef.current > 35) {
+      if (now - lastEmitRef.current > 85) {
         lastEmitRef.current = now;
         createParticles(e.clientX, e.clientY);
       }
@@ -64,35 +76,40 @@ export const MagicCursor: React.FC = () => {
     let animationFrameId: number;
     
     const updateTrailing = () => {
-      setTrailingPosition((prev) => {
-        const dx = position.x - prev.x;
-        const dy = position.y - prev.y;
-        return {
-          x: prev.x + dx * 0.15,
-          y: prev.y + dy * 0.15,
-        };
-      });
+      const p = posRef.current;
+      const t = trailRef.current;
+      const dx = p.x - t.x;
+      const dy = p.y - t.y;
+      
+      trailRef.current.x = t.x + dx * 0.15;
+      trailRef.current.y = t.y + dy * 0.15;
+
+      if (circleRef.current) {
+        circleRef.current.style.left = `${trailRef.current.x}px`;
+        circleRef.current.style.top = `${trailRef.current.y}px`;
+      }
+      
       animationFrameId = requestAnimationFrame(updateTrailing);
     };
     
     animationFrameId = requestAnimationFrame(updateTrailing);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [position]);
+  }, []);
 
   // Create particles (sparkles & petals)
   const createParticles = (x: number, y: number) => {
     const particles = particlesRef.current;
     
-    // Always emit 1-2 small golden sparkles
-    const sparkleCount = Math.floor(Math.random() * 2) + 1;
+    // Lower chance of emitting a small golden sparkle
+    const sparkleCount = Math.random() < 0.65 ? 1 : 0;
     for (let i = 0; i < sparkleCount; i++) {
       particles.push({
         x,
         y,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: (Math.random() - 0.5) * 1.5 - 0.5, // slightly upward drift
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: (Math.random() - 0.5) * 1.2 - 0.4, // slightly upward drift
         alpha: 1.0,
-        size: Math.random() * 2 + 1.5,
+        size: Math.random() * 1.8 + 1.2,
         type: 'sparkle',
         angle: 0,
         rotationSpeed: 0
@@ -100,7 +117,7 @@ export const MagicCursor: React.FC = () => {
     }
 
     // Rare chance to emit a lily petal
-    if (Math.random() < 0.15) {
+    if (Math.random() < 0.08) {
       particles.push({
         x,
         y,
@@ -115,7 +132,7 @@ export const MagicCursor: React.FC = () => {
     }
 
     // Cap particles
-    if (particles.length > 150) {
+    if (particles.length > 80) {
       particles.shift();
     }
   };
@@ -203,10 +220,9 @@ export const MagicCursor: React.FC = () => {
     <>
       {/* Visual Cursor Indicator */}
       <div
+        ref={dotRef}
         className="magic-cursor-dot"
         style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
           width: isHovered ? '12px' : '8px',
           height: isHovered ? '12px' : '8px',
           backgroundColor: isHovered ? 'var(--lily-white)' : 'var(--gold-accent)',
@@ -214,10 +230,9 @@ export const MagicCursor: React.FC = () => {
         }}
       />
       <div
+        ref={circleRef}
         className="magic-cursor-circle"
         style={{
-          left: `${trailingPosition.x}px`,
-          top: `${trailingPosition.y}px`,
           transform: `translate(-50%, -50%) scale(${isHovered ? 1.5 : 1})`,
           borderColor: isHovered ? 'var(--lily-white)' : 'rgba(242, 227, 198, 0.3)',
           backgroundColor: isHovered ? 'rgba(252, 251, 250, 0.05)' : 'transparent',

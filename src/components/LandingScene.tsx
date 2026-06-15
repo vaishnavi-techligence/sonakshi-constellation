@@ -157,6 +157,7 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
   const moonHoveredRef = useRef(false);
   const moonClickedRef = useRef(false);
   const secretTriggeredRef = useRef(false);
+  const isSkippedRef = useRef(false);
   const moonImgRef = useRef<HTMLImageElement | null>(null);
 
   // References for animation loop coordination
@@ -285,7 +286,7 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
 
       let nextMusicTriggered = false;
       const playNextMusic = () => {
-        if (nextMusicTriggered) return;
+        if (nextMusicTriggered || isSkippedRef.current) return;
         nextMusicTriggered = true;
 
         const musicAudio = new Audio('/music/moon_song.mp3');
@@ -1545,73 +1546,7 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
       const isLeftHovered = Math.hypot(mousePos.x - dandLeftX, mousePos.y - dandY) < 40;
       const isRightHovered = Math.hypot(mousePos.x - dandRightX, mousePos.y - dandY) < 40;
 
-      // Draw both dandelions
-      const dandelions = [
-        { x: dandLeftX, progress: dandEvent.leftRegrowthProgress, hovered: isLeftHovered, side: 'left' },
-        { x: dandRightX, progress: dandEvent.rightRegrowthProgress, hovered: isRightHovered, side: 'right' }
-      ];
-
-      dandelions.forEach((dand) => {
-        // 1. Draw Dandelion Stem
-        ctx.strokeStyle = `rgba(242, 227, 198, ${0.45 * dand.progress})`;
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(dand.x, canvas.height);
-        ctx.quadraticCurveTo(dand.x + (dand.side === 'left' ? -5 : 5), canvas.height - 35, dand.x, dandY);
-        ctx.stroke();
-
-        // 2. Draw Dandelion Head Glow
-        if (dand.progress > 0.05) {
-          const headGlow = ctx.createRadialGradient(dand.x, dandY, 0, dand.x, dandY, 25);
-          const glowHoverFactor = dand.hovered ? 1.3 : 1.0;
-          headGlow.addColorStop(0, `rgba(255, 253, 245, ${0.35 * dand.progress * glowHoverFactor})`);
-          headGlow.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = headGlow;
-          ctx.beginPath();
-          ctx.arc(dand.x, dandY, 25, 0, Math.PI * 2);
-          ctx.fill();
-
-          // Draw radiating fluff spokes
-          ctx.strokeStyle = `rgba(242, 227, 198, ${0.75 * dand.progress})`;
-          ctx.lineWidth = 0.8;
-          const numSpokes = 18;
-          for (let i = 0; i < numSpokes; i++) {
-            // If detaching, don't draw the already-detached seeds
-            if (dandEvent.state !== 'idle' && dandEvent.clickedSide === dand.side) {
-              const timeElapsed = now - dandEvent.startTime;
-              const seedIndexThreshold = Math.floor(numSpokes * (timeElapsed / 2000));
-              if (i < seedIndexThreshold) continue;
-            }
-            const angle = (i / numSpokes) * Math.PI * 2;
-            const px = dand.x + Math.cos(angle) * 14 * dand.progress;
-            const py = dandY + Math.sin(angle) * 14 * dand.progress;
-            
-            ctx.beginPath();
-            ctx.moveTo(dand.x, dandY);
-            ctx.lineTo(px, py);
-            ctx.stroke();
-            
-            // Outer fluff dot
-            ctx.fillStyle = `rgba(255, 255, 255, ${0.85 * dand.progress})`;
-            ctx.beginPath();
-            ctx.arc(px, py, 1.2, 0, Math.PI * 2);
-            ctx.fill();
-          }
-        }
-
-        // 3. Draw Whisper Hint ("make a wish")
-        const mouseDist = Math.hypot(mousePos.x - dand.x, mousePos.y - dandY);
-        if (mouseDist < 120 && dandEvent.state === 'idle') {
-          ctx.save();
-          // Pulsing faint text
-          const hintAlpha = 0.25 + Math.sin(now * 0.002) * 0.12;
-          ctx.fillStyle = `rgba(242, 227, 198, ${hintAlpha})`;
-          ctx.font = "italic 300 13px 'Montserrat', sans-serif";
-          ctx.textAlign = 'center';
-          ctx.fillText("*make a wish*", dand.x, dandY - 35);
-          ctx.restore();
-        }
-      });
+      // Dandelion rendering removed per request
 
       // 4. Update and Draw Dandelion Seeds
       if (dandEvent.state !== 'idle') {
@@ -1923,53 +1858,7 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
         }}
       />
 
-      {/* INVISIBLE POINTER INTERACTION TARGET FOR LEFT DANDELION (Phase 3) */}
-      <div
-        className="interactive"
-        onMouseEnter={() => {
-          dandelionHoveredRef.current = true;
-        }}
-        onMouseLeave={() => {
-          dandelionHoveredRef.current = false;
-        }}
-        onClick={(e) => handleDandelionClick(e, 'left')}
-        style={{
-          position: 'absolute',
-          left: '150px',
-          bottom: '90px',
-          transform: 'translate(-50%, 50%)',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          zIndex: 9998,
-          backgroundColor: 'transparent'
-        }}
-      />
-
-      {/* INVISIBLE POINTER INTERACTION TARGET FOR RIGHT DANDELION (Phase 3) */}
-      <div
-        className="interactive"
-        onMouseEnter={() => {
-          dandelionHoveredRef.current = true;
-        }}
-        onMouseLeave={() => {
-          dandelionHoveredRef.current = false;
-        }}
-        onClick={(e) => handleDandelionClick(e, 'right')}
-        style={{
-          position: 'absolute',
-          right: '150px',
-          bottom: '90px',
-          transform: 'translate(50%, 50%)',
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          cursor: 'pointer',
-          zIndex: 9998,
-          backgroundColor: 'transparent'
-        }}
-      />
+      {/* Dandelion interaction pointers removed per request */}
       {/* CLICK THE MOON HINT — fades out once moon      {!secretTriggered && (
         <div
           style={{
@@ -2000,6 +1889,34 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
           </span>
         </div>
       )}
+
+      {/* INSTRUCTION OVERLAY */}
+      {!secretTriggered && (
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '42%',
+            transform: 'translate(-50%, -50%)',
+            textAlign: 'center',
+            pointerEvents: 'none',
+            zIndex: 9998,
+            animation: 'fade-in 3.5s ease-out forwards',
+            opacity: 0.7
+          }}
+        >
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            fontSize: '0.8rem',
+            color: '#e9d5ff',
+            letterSpacing: '0.35em',
+            textTransform: 'uppercase',
+            textShadow: '0 0 12px rgba(168, 85, 247, 0.9)'
+          }}>
+            Tap the moon
+          </p>
+        </div>
+      )}
   
       {/* BRANDING TITLE OVERLAY */}
       {!secretTriggered && (
@@ -2007,23 +1924,27 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
           style={{
             position: 'absolute',
             left: '50%',
-            top: '68%', // repositioned to 68% so it sits beautifully without falling off the page
+            top: '68%',
             transform: 'translate(-50%, -50%)',
             textAlign: 'center',
             pointerEvents: 'none',
             zIndex: 9997,
-            animation: 'fade-in 2.5s ease-out forwards'
+            animation: 'fade-in 2.5s ease-out forwards',
+            background: 'radial-gradient(ellipse at center, rgba(5, 5, 15, 0.9) 0%, rgba(5, 5, 15, 0.5) 45%, transparent 75%)',
+            padding: '60px 120px',
+            width: '100%',
+            maxWidth: '1000px'
           }}
         >
           <h1
             style={{
               fontFamily: 'var(--font-serif-display)',
-              fontSize: '2.5rem',
-              fontWeight: 500,
-              color: '#fff',
+              fontSize: '2.8rem',
+              fontWeight: 700,
+              color: '#ffffff',
               letterSpacing: '0.28em',
               textTransform: 'uppercase',
-              textShadow: '0 3px 25px rgba(0, 0, 0, 0.95), 0 0 15px rgba(242, 227, 198, 0.15)'
+              textShadow: '0 4px 30px rgba(0, 0, 0, 1), 0 0 20px rgba(255, 255, 255, 0.3)'
             }}
           >
             Sonakshi's Lily Garden
@@ -2031,14 +1952,14 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
           <p
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: '1.05rem',
-              fontWeight: 600,
+              fontSize: '1.15rem',
+              fontWeight: 700,
               color: '#fffdf5',
               letterSpacing: '0.45em',
               textTransform: 'uppercase',
-              marginTop: '12px',
+              marginTop: '16px',
               opacity: 1.0,
-              textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 4px 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(242, 227, 198, 0.4)'
+              textShadow: '0 3px 15px rgba(0, 0, 0, 1), 0 0 15px rgba(255, 255, 255, 0.2)'
             }}
           >
             A Universe As Beautiful As You
@@ -2083,6 +2004,61 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
           </svg>
         )}
       </div>
+
+      {/* SKIP BUTTON — appears after moon click / secret triggered */}
+      {secretTriggered && !isFadingOut && (
+        <div
+          className="animate-fade-in"
+          style={{
+            position: 'absolute',
+            bottom: '40px',
+            right: '48px',
+            zIndex: 10002,
+            animation: 'fade-in 2s ease-out forwards',
+          }}
+        >
+          <button
+            onClick={() => {
+              isSkippedRef.current = true;
+              // Pause any audio playing
+              if (activeMusicAudioRef.current) {
+                activeMusicAudioRef.current.pause();
+              }
+              setIsFadingOut(true);
+              setTimeout(() => onComplete(), 1200);
+            }}
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(242, 227, 198, 0.25)',
+              color: 'rgba(242, 227, 198, 0.7)',
+              padding: '10px 22px',
+              borderRadius: '24px',
+              fontSize: '0.72rem',
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              backdropFilter: 'blur(8px)',
+              fontFamily: 'var(--font-sans)',
+              transition: 'all 0.3s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
+              e.currentTarget.style.color = '#f2e3c6';
+              e.currentTarget.style.borderColor = 'rgba(242, 227, 198, 0.5)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+              e.currentTarget.style.color = 'rgba(242, 227, 198, 0.7)';
+              e.currentTarget.style.borderColor = 'rgba(242, 227, 198, 0.25)';
+            }}
+          >
+            Skip → Enter the Garden
+          </button>
+        </div>
+      )}
 
       {/* RIPPLE EXPANSION CLIP OVERLAY FOR ENTERING THE GARDEN */}
       {isFadingOut && (

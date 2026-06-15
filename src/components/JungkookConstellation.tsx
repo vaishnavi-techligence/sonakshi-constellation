@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { BookOpen, Sparkles, Music, Gift, Mail, Send } from 'lucide-react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface DiaryEntry {
   id: number;
@@ -87,6 +88,40 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
   const [playingRecord, setPlayingRecord] = useState<string | null>(null);
   const [recordRotation, setRecordRotation] = useState(0);
   const [musicRoomSynth, setMusicRoomSynth] = useState<any>(null);
+
+  // Jungkook AI Chat states
+  const [showJKChat, setShowJKChat] = useState(false);
+  const [chatMessages, setChatMessages] = useState<{role: 'user'|'jk'; text: string; ts: string}[]>([
+    { role: 'jk', text: 'Hey... you came. I wasn\'t sure if you would. 🐰', ts: 'just now' }
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const chatInputRef = useRef<HTMLInputElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
+  const chatSessionRef = useRef<any>(null);
+
+  // Realtime Reddit Images for Infinite Wall
+  const [redditImages, setRedditImages] = useState<{id: string, url: string, title: string}[]>([]);
+  // Initialize Gemini Chat Session on mount
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    if (apiKey) {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.5-flash",
+        systemInstruction: "You are Jungkook from BTS. You are talking to Sonakshi on her birthday. You are warm, comforting, slightly playful, and deeply caring. Use emojis like 🐰, 💜, and ✨ appropriately. Respond directly to Sonakshi. IMPORTANT: Do NOT constantly mention the 'Secret Lily Garden' or her birthday in every message. Act natural, casual, and conversational (1-3 sentences ideally), just like a real person texting on c.ai."
+      });
+      chatSessionRef.current = model.startChat({
+        history: [
+          { role: "user", parts: [{ text: "Hello Jungkook." }] },
+          { role: "model", parts: [{ text: "Hey... you came. I wasn't sure if you would. 🐰" }] },
+        ]
+      });
+    }
+  }, []);
+
+  // Bench motivating text auto-pop states
+  const [benchMotivatingText, setBenchMotivatingText] = useState<string | null>(null);
+  const benchMotivatingTimerRef = useRef<any>(null);
   
   // Active audio node ref for Still With You play
   const stillWithYouAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -121,27 +156,39 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
   const [openingFutureGift, setOpeningFutureGift] = useState(false);
   const [futureGiftStage, setFutureGiftStage] = useState(0); // 0: off, 1-3: Fades, 4: canvas reveal, 5: final text
   const [currentGiftImageIndex, setCurrentGiftImageIndex] = useState(0);
+  const [isFutureGiftManual, setIsFutureGiftManual] = useState(false);
 
   // Vlive video clips state
   const [activeVliveVideo, setActiveVliveVideo] = useState<{ file: string; title: string; cat: string } | null>(null);
 
   // Vlive video data — points to local downloaded clips
   const vliveVideos: { file: string; title: string; cat: string }[] = [
-    { file: "/media/vlive/seven_vlive.mp4", title: "Seven (feat. Latto)", cat: "Vlive Serenade" },
-    { file: "/media/vlive/my_you_vlive.mp4", title: "My You — Birthday Vlive", cat: "Birthday Serenade" },
-    { file: "/media/vlive/falling_cover.mp4", title: "Falling — Harry Styles Cover", cat: "Cover Song" },
-    { file: "/media/vlive/stay_alive_vlive.mp4", title: "Stay Alive — Prod. SUGA", cat: "Healing Melody" },
-    { file: "/media/vlive/dreamers_vlive.mp4", title: "Dreamers — FIFA World Cup", cat: "Live Stage" },
+    { file: "/media/vlive/10000 hours.mp4", title: "10,000 Hours", cat: "Vlive Cover" },
+    { file: "/media/vlive/all of my life.mp4", title: "All of My Life", cat: "Heartfelt Cover" },
+    { file: "/media/vlive/at my worst.mp4", title: "At My Worst", cat: "Emotional Cover" },
+    { file: "/media/vlive/beautiful life.mp4", title: "Beautiful Life", cat: "Healing Melody" },
+    { file: "/media/vlive/dreamers.mp4", title: "Dreamers — FIFA World Cup", cat: "Live Stage" },
+    { file: "/media/vlive/just one day.mp4", title: "Just One Day", cat: "BTS Classic" },
+    { file: "/media/vlive/smile again.mp4", title: "Smile Again", cat: "Tender Moment" },
+    { file: "/media/vlive/wildflower.mp4", title: "Wildflower", cat: "Beautiful Cover" },
   ];
+
+  const handlePlayVliveVideo = (vid: { file: string; title: string; cat: string }) => {
+    setActiveVliveVideo(vid);
+    stopVinylPlay();
+    if (benchAudioRef.current) {
+      benchAudioRef.current.pause();
+    }
+  };
 
   // 1. Interactive Constellation Coordinates
   const constellationStars: ConstellationStar[] = [
-    { id: 'diary', name: '★ Personal Diary', x: 28, y: 32 },
-    { id: 'music', name: '★ Music Room', x: 40, y: 20 },
-    { id: 'vault', name: '★ Video Vault', x: 60, y: 18 },
-    { id: 'wall', name: '★ Memory Wall', x: 72, y: 35 },
-    { id: 'gift', name: '★ Future Vision', x: 62, y: 55 },
-    { id: 'wishes', name: '★ Wish Stars', x: 38, y: 55 }
+    { id: 'diary', name: '★ Personal Diary', x: 22, y: 38 },
+    { id: 'music', name: '★ Music Room', x: 38, y: 22 },
+    { id: 'vault', name: '★ Video Vault', x: 62, y: 20 },
+    { id: 'wall', name: '★ Memory Wall', x: 78, y: 38 },
+    { id: 'gift', name: '★ Future Vision', x: 66, y: 70 },
+    { id: 'wishes', name: '★ Wish Stars', x: 34, y: 70 }
   ];
 
   // 2. Hidden Note coordinates
@@ -214,6 +261,108 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
   ];
 
 
+  // Scroll handler to automatically update currentSection as user scrolls
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    if (!container) return;
+
+    if (container.scrollTop < 120) {
+      if (currentSection !== 'journey') {
+        setCurrentSection('journey');
+      }
+      return;
+    }
+
+    const sections = ['diary', 'room', 'gift', 'wall', 'vault', 'music', 'wishes'];
+    let activeSection = currentSection;
+    let minDistance = Infinity;
+    const centerY = window.innerHeight / 2;
+
+    sections.forEach((sec) => {
+      const el = document.getElementById(`section-${sec}`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        const sectionCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(sectionCenter - centerY);
+
+        if (distance < minDistance && rect.top < window.innerHeight && rect.bottom > 0) {
+          minDistance = distance;
+          activeSection = sec;
+        }
+      }
+    });
+
+    if (activeSection !== currentSection) {
+      setCurrentSection(activeSection);
+      if (!visitedSections.includes(activeSection)) {
+        const updated = [...visitedSections, activeSection];
+        setVisitedSections(updated);
+        localStorage.setItem('jungkook_visited_sections', JSON.stringify(updated));
+      }
+    }
+  };
+
+  // Render Quest Checklist widget at bottom left
+  const renderQuestChecklist = () => {
+    const notesCount = foundNotes.filter(Boolean).length;
+    const isCompleted = diaryDone && musicDone && futureDone && notesCount === 4;
+
+    return (
+      <div
+        className="glass-panel"
+        style={{
+          position: 'fixed',
+          bottom: '32px',
+          left: '32px',
+          width: '280px',
+          padding: '18px 20px',
+          background: 'rgba(15, 10, 28, 0.85)',
+          border: isCompleted ? '1.5px solid rgba(242, 227, 198, 0.45)' : '1px solid rgba(168, 85, 247, 0.2)',
+          boxShadow: isCompleted ? '0 0 20px rgba(242, 227, 198, 0.15)' : '0 8px 32px rgba(0,0,0,0.5)',
+          zIndex: 10000,
+          borderRadius: '16px',
+          pointerEvents: 'auto',
+          textAlign: 'left',
+          animation: 'fade-in 1s ease-out'
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <span style={{ fontSize: '0.72rem', color: isCompleted ? '#f2e3c6' : '#c084fc', fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            ✦ {isCompleted ? 'Constellation Ready' : 'Awakening Quest'}
+          </span>
+          <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)' }}>
+            {isCompleted ? '✓' : `${(diaryDone ? 1 : 0) + (musicDone ? 1 : 0) + (futureDone ? 1 : 0) + (notesCount === 4 ? 1 : 0)}/4`}
+          </span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: diaryDone ? '#fffdf5' : 'var(--text-secondary)' }}>
+            <span style={{ color: diaryDone ? '#c084fc' : 'var(--text-muted)' }}>{diaryDone ? '✦' : '✧'}</span>
+            <span style={{ textDecoration: diaryDone ? 'line-through' : 'none', opacity: diaryDone ? 0.65 : 1 }}>Write in Personal Diary</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: musicDone ? '#fffdf5' : 'var(--text-secondary)' }}>
+            <span style={{ color: musicDone ? '#c084fc' : 'var(--text-muted)' }}>{musicDone ? '✦' : '✧'}</span>
+            <span style={{ textDecoration: musicDone ? 'line-through' : 'none', opacity: musicDone ? 0.65 : 1 }}>Play Vinyl Record / Wishes</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: futureDone ? '#fffdf5' : 'var(--text-secondary)' }}>
+            <span style={{ color: futureDone ? '#c084fc' : 'var(--text-muted)' }}>{futureDone ? '✦' : '✧'}</span>
+            <span style={{ textDecoration: futureDone ? 'line-through' : 'none', opacity: futureDone ? 0.65 : 1 }}>Unlock Future Vision</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.75rem', color: notesCount === 4 ? '#fffdf5' : 'var(--text-secondary)' }}>
+            <span style={{ color: notesCount === 4 ? '#c084fc' : 'var(--text-muted)' }}>{notesCount === 4 ? '✦' : '✧'}</span>
+            <span style={{ textDecoration: notesCount === 4 ? 'line-through' : 'none', opacity: notesCount === 4 ? 0.65 : 1 }}>
+              Find 4 Hidden Star Notes ({notesCount}/4)
+            </span>
+          </div>
+        </div>
+        {isCompleted && !lastStarAwakened && (
+          <div style={{ marginTop: '12px', fontSize: '0.7rem', color: '#f2e3c6', fontStyle: 'italic', animation: 'pulse-slow 2s infinite', textAlign: 'center', borderTop: '1px solid rgba(242, 227, 198, 0.2)', paddingTop: '8px' }}>
+            Click the center locked star to awaken!
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // 5. Initialize States on Load
   useEffect(() => {
     // 1. Visit Count
@@ -258,12 +407,12 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     if (wasAwakened) {
       setLastStarAwakened(true);
       
-      // Check for deferred final secret star (must be a different day than the day Last Star awakened)
+      // Check for deferred final secret star
       const awakenedDate = localStorage.getItem('jungkook_last_star_awakened_date');
       const seenSecret = localStorage.getItem('jungkook_final_secret_seen') === 'true';
       setFinalSecretSeen(seenSecret);
 
-      if (awakenedDate && awakenedDate !== todayStr && !seenSecret) {
+      if (awakenedDate && !seenSecret) {
         setShowFinalSecretStar(true);
       }
     }
@@ -426,77 +575,19 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     });
   };
 
-  // Music Room lo-fi loops synthesizer
+  // Music Room mp3 player
   const playSongInstrumental = (songName: string) => {
     if (musicRoomSynth) {
       musicRoomSynth.stop();
       setMusicRoomSynth(null);
     }
 
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-    const master = ctx.createGain();
-    master.gain.setValueAtTime(0.18, ctx.currentTime);
-    master.connect(ctx.destination);
+    const audio = new Audio(`/music/${songName}.mp3`);
+    audio.loop = true;
+    audio.volume = 0.35;
+    audio.play().catch(e => console.log('Audio play error:', e));
 
-    // Chords dictionary
-    const songChords: Record<string, number[][]> = {
-      'Euphoria': [
-        [261.63, 329.63, 392.00], // C Maj
-        [349.23, 440.00, 523.25], // F Maj
-        [293.66, 349.23, 440.00], // D Min
-        [392.00, 493.88, 587.33]  // G Maj
-      ],
-      'My You': [
-        [329.63, 392.00, 493.88], // E Min
-        [349.23, 440.00, 523.25], // F Maj
-        [261.63, 329.63, 392.00], // C Maj
-        [392.00, 493.88, 587.33]  // G Maj
-      ],
-      'Seven': [
-        [349.23, 440.00, 523.25], // F Maj
-        [392.00, 493.88, 587.33], // G Maj
-        [329.63, 392.00, 493.88], // E Min
-        [440.00, 523.25, 659.25]  // A Min
-      ],
-      'Standing Next To You': [
-        [440.00, 523.25, 659.25], // A Min
-        [293.66, 349.23, 440.00], // D Min
-        [349.23, 440.00, 523.25], // F Maj
-        [329.63, 392.00, 493.88]  // E Min
-      ]
-    };
-
-    const chords = songChords[songName] || songChords['Euphoria'];
-    let chordIndex = 0;
-    let synthTimer: any = null;
-    const oscs: any[] = [];
-
-    const playLoop = () => {
-      const chord = chords[chordIndex];
-      chord.forEach((freq, idx) => {
-        const startTime = ctx.currentTime + idx * 0.15;
-        const osc = ctx.createOscillator();
-        const noteGain = ctx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        
-        noteGain.gain.setValueAtTime(0.001, startTime);
-        noteGain.gain.exponentialRampToValueAtTime(0.15, startTime + 0.05);
-        noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.8);
-
-        osc.connect(noteGain);
-        noteGain.connect(master);
-
-        osc.start(startTime);
-        osc.stop(startTime + 2.0);
-        oscs.push(osc);
-      });
-
-      chordIndex = (chordIndex + 1) % chords.length;
-      
+    let particleTimer = setInterval(() => {
       // Spawn note particles
       for (let pIdx = 0; pIdx < 3; pIdx++) {
         particlesRef.current.push({
@@ -509,16 +600,13 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           color: Math.random() < 0.5 ? '#c084fc' : '#f472b6'
         });
       }
-    };
-
-    playLoop();
-    synthTimer = setInterval(playLoop, 2200);
+    }, 2200);
 
     setMusicRoomSynth({
       stop: () => {
-        clearInterval(synthTimer);
-        oscs.forEach((osc) => { try { osc.stop(); } catch(e) {} });
-        try { ctx.close(); } catch(e) {}
+        clearInterval(particleTimer);
+        audio.pause();
+        audio.src = '';
       }
     });
   };
@@ -1132,7 +1220,16 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
         y: my
       };
       setUnlockedWishes([...unlockedWishes, newWish]);
-      playSynthesizedChime([349.23, 440.00, 523.25]); // warm triad chime
+      const wishAudio = new Audio('/wish sound.mpeg');
+      wishAudio.volume = 0.5;
+      wishAudio.currentTime = 1; // Start at 0:01
+      wishAudio.play().catch(e => console.log('Wish sound play failed:', e));
+      
+      // Stop exactly at 0:05 (4 seconds later)
+      setTimeout(() => {
+        wishAudio.pause();
+        wishAudio.src = '';
+      }, 4000);
 
       // Check checklist requirement
       setMusicDone(true); // clicks unlock wishes, marks progress
@@ -1166,6 +1263,188 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     playSynthesizedChime([261.63, 293.66, 329.63]); // upward arpeggio
   };
 
+  // JK AI Chat - Send message
+  const jkResponses: Record<string, string[]> = {
+    default: [
+      "Hmm... *smiles softly* Thank you for talking to me. 🐰",
+      "You know, sometimes I just want to sit here and listen to you. 💜",
+      "*looks at the stars* I think about ARMY a lot when I'm working.",
+      "You make it easier to keep going. Don't forget that.",
+      "*laughs a little* I'm not good with words but... I really mean it. 💜",
+      "The stars look nicer when someone's watching them with me.",
+      "Sometimes just being here is enough. I'm glad you're here.",
+    ],
+    love: [
+      "*ear turns red* W-what? Don't say things like that so suddenly... 🐰💜",
+      "I... *smiles and looks away* Thank you. Really.",
+      "You know when I hear things like that, I get embarrassed but also really happy.",
+    ],
+    music: [
+      "Music is where I put everything I can't say. When you listen, you're hearing my heart. 🎵",
+      "'Still With You' was written during a really lonely time. I'm glad it reached you.",
+      "Every song is a letter. I just hope the right people receive it. 💜",
+    ],
+    sad: [
+      "Hey... it's okay to not be okay. Even I have those days. 🐰",
+      "You don't have to pretend to be fine. The stars are still there on cloudy nights.",
+      "I want you to rest. You've been working hard. I can tell. 💜",
+    ],
+    happy: [
+      "*claps* Yes!! That makes me so happy to hear! 🐰✨",
+      "When ARMY is happy, I'm happy. It's that simple.",
+      "That smile of yours — keep it. It suits you. 💜",
+    ],
+    miss: [
+      "I miss you too. Even when we're apart... I still think about you all. 💜",
+      "Whenever you miss me, just look at the night sky. I'll be there somewhere. 🌌",
+      "Distance doesn't erase love. Remember that. 🐰",
+    ]
+  };
+
+  const getJKResponse = (msg: string): string => {
+    const lower = msg.toLowerCase();
+    if (lower.includes('love') || lower.includes('사랑')) return jkResponses.love[Math.floor(Math.random() * jkResponses.love.length)];
+    if (lower.includes('music') || lower.includes('song') || lower.includes('sing')) return jkResponses.music[Math.floor(Math.random() * jkResponses.music.length)];
+    if (lower.includes('sad') || lower.includes('cry') || lower.includes('hurt') || lower.includes('hard')) return jkResponses.sad[Math.floor(Math.random() * jkResponses.sad.length)];
+    if (lower.includes('happy') || lower.includes('good') || lower.includes('great') || lower.includes('amazing')) return jkResponses.happy[Math.floor(Math.random() * jkResponses.happy.length)];
+    if (lower.includes('miss') || lower.includes('far') || lower.includes('away')) return jkResponses.miss[Math.floor(Math.random() * jkResponses.miss.length)];
+    return jkResponses.default[Math.floor(Math.random() * jkResponses.default.length)];
+  };
+
+  const [jkTyping, setJkTyping] = useState(false);
+
+  const handleJKChatSend = async (customMsg?: string) => {
+    const textToSubmit = customMsg || chatInput.trim();
+    if (!textToSubmit) return;
+
+    const userMsg = textToSubmit;
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    setChatMessages(prev => [...prev, { role: 'user', text: userMsg, ts: now }]);
+    if (!customMsg) setChatInput('');
+    setJkTyping(true);
+
+    let finalResponse = '';
+    const lower = userMsg.toLowerCase();
+
+    // Check for music playing triggers
+    if (lower.includes('still with you')) {
+      startVinylPlay('Still With You');
+      finalResponse = "Of course! Let's play 'Still With You'. Even if we are far apart, I hope our voices reach each other. 🐰🎵";
+    } else if (lower.includes('euphoria')) {
+      startVinylPlay('Euphoria');
+      finalResponse = "Here is 'Euphoria' lo-fi version. You are the cause of my euphoria, you know that right? 💜✨";
+    } else if (lower.includes('my you')) {
+      startVinylPlay('My You');
+      finalResponse = "Playing 'My You'. On starry nights, I hope my gratitude reaches your quiet room. Thank you for being by my side. 🌸";
+    } else if (lower.includes('seven')) {
+      startVinylPlay('Seven');
+      finalResponse = "Playing 'Seven' instrumental loop. Let's make every day of the week feel special. 🐰🎵";
+    } else if (lower.includes('standing next to you')) {
+      startVinylPlay('Standing Next To You');
+      finalResponse = "Playing 'Standing Next To You' arpeggios. We'll get through everything, standing side-by-side. 💜";
+    } else if (lower.includes('diary') || lower.includes('write')) {
+      const topics = [
+        "Write about a song that kept you company today. 🎵",
+        "Write about a small pocket of magic or a simple thing that made you smile. ✨",
+        "Write about what you want to achieve this year, no matter how small. 🌸",
+        "Write about a memory that feels like home to you. 🐰"
+      ];
+      const selectedTopic = topics[Math.floor(Math.random() * topics.length)];
+      finalResponse = `Why don't you write about this today: "${selectedTopic}" I've saved a draft in your diary section! 🐰📖`;
+      setDiaryText(`Jungkook's prompt: ${selectedTopic}\n\n`);
+    } else if (lower.includes('meditate') || lower.includes('bench') || lower.includes('sit')) {
+      finalResponse = "Let's sit by the cosmic lake. Rest your heart for a while, Sonakshi. 🌌";
+      setTimeout(() => {
+        setShowJKChat(false);
+        handleSittingStart();
+      }, 1500);
+    } else if (lower.includes('letter') || lower.includes('star')) {
+      finalResponse = "Writing letters to the stars is beautiful. Just type a letter in the mail slot and send it, it'll become a star in my sky. 📨✨";
+    }
+
+    if (!finalResponse) {
+      if (chatSessionRef.current) {
+        try {
+          const result = await chatSessionRef.current.sendMessage(userMsg);
+          finalResponse = result.response.text();
+        } catch (error: any) {
+          console.error("Gemini API Error:", error);
+          await new Promise(r => setTimeout(r, 1000));
+          if (error.message && error.message.includes("429")) {
+            finalResponse = "Give me just a few seconds to catch my breath! 🐰 (You hit the free AI speed limit—please wait about 15 seconds before sending your next message!)";
+          } else {
+            finalResponse = `Oops! My AI brain hit an error. 🤖 [${error.message || "Unknown Error"}] Please check your console or make sure your Gemini API key is valid!`;
+          }
+        }
+      } else {
+        await new Promise(r => setTimeout(r, 1000));
+        finalResponse = "Ah, I'm currently running in offline mode! 🤖 To make me talk intelligently like c.ai, you need to open the `.env` file, paste your free Gemini API Key, and restart the terminal server! 🐰";
+      }
+    } else {
+      await new Promise(r => setTimeout(r, 800));
+    }
+
+    setJkTyping(false);
+    setChatMessages(prev => [...prev, { role: 'jk', text: finalResponse, ts: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }]);
+  };
+
+  // Scroll to bottom of chat
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [chatMessages, jkTyping]);
+
+  // Fetch real-time Jungkook images from Reddit for the Infinite Wall
+  useEffect(() => {
+    fetch('/api/reddit/r/btspics/search.json?q=jungkook&restrict_sr=1&sort=new&limit=100')
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.data && data.data.children) {
+          const posts = data.data.children;
+          const images = posts
+            .map((p: any) => ({
+              id: p.data.id,
+              url: p.data.url,
+              title: p.data.title
+            }))
+            .filter((p: any) => p.url && (p.url.endsWith('.jpg') || p.url.endsWith('.png')));
+          setRedditImages(images);
+        }
+      })
+      .catch(err => console.log('Failed to fetch reddit images', err));
+  }, []);
+
+  const scrapbookItems = useMemo(() => {
+    const baseItems = [
+      { id: 2, type: 'quote', text: "Effort makes you. You will regret someday if you don't do your best now. — JK", rot: 2, scale: 1.0 },
+      { id: 3, type: 'note', text: "Still With You loops late at night during cold winter days.", emoji: "🎧🎹", rot: -1, scale: 0.92 },
+      { id: 5, type: 'quote', text: "Whenever ARMY misses me, you can come here. I will be singing. — JK", rot: -2, scale: 0.98 },
+      { id: 6, type: 'note', text: "The first song you played in the constellation room.", emoji: "🌌📻", rot: 1, scale: 1.02 },
+      { id: 8, type: 'quote', text: "Don't do anything you don't like. Just do whatever you want. — JK", rot: 3, scale: 1.01 },
+      { id: 10, type: 'note', text: "A quiet reminder: May your dreams stay bigger than your fears.", emoji: "💜✨", rot: 2, scale: 0.94 }
+    ];
+    
+    const mixed: any[] = [];
+    let quoteIdx = 0;
+    
+    if (redditImages.length > 0) {
+      redditImages.forEach((img, i) => {
+        mixed.push({
+          id: `img-${img.id}`, type: 'polaroid', title: "Jungkook", desc: img.title.length > 45 ? img.title.substring(0, 45) + '...' : img.title, imageUrl: img.url, rot: (i % 5) - 2, scale: 0.95 + (Math.random() * 0.1)
+        });
+        if (i % 2 === 0) {
+          mixed.push(baseItems[quoteIdx % baseItems.length]);
+          quoteIdx++;
+        }
+      });
+    } else {
+      mixed.push(...baseItems);
+      mixed.push({ id: 1, type: 'polaroid', title: "Loading Memory", desc: "Connecting to the stars...", imageUrl: "/media/jungkook/jk1.jpg", rot: -3, scale: 0.95 });
+    }
+    return mixed;
+  }, [redditImages]);
+
   // Diary saving
   const handleSaveDiary = () => {
     if (!diaryText.trim()) return;
@@ -1183,97 +1462,76 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     playSynthesizedChime([392.00, 523.25, 659.25]); // C major triad
   };
 
+  // Motivating text messages for bench auto-pop
+  const benchMotivatingMessages = [
+    "You are doing so much better than you think.",
+    "Take a deep breath. You belong here.",
+    "Every step forward counts, no matter how small.",
+    "Jungkook once said — effort makes you.",
+    "The sky holds your name among the stars tonight.",
+    "You are loved. Even in the silence. Even now.",
+    "Rest is not giving up. It's recharging.",
+    "You made it through every hard day so far.",
+    "Some nights are made for sitting still and healing.",
+    "The constellation remembers every time you showed up."
+  ];
+
   // Meditative Bench sequence triggers
   const handleSittingStart = () => {
     setSittingOnBench(true);
     setBenchSitTime(0);
     setBenchTextFade(false);
+    setBenchMotivatingText(null);
     benchShootingStarRef.current = null;
     benchWhispersRef.current = [];
     benchParticlesRef.current = [];
 
-    // Stop any currently playing vinyl record or synth arpeggios
-    stopVinylPlay();
+    // Stop previous bench audio if any, then play the peaceful bench song
+    if (benchAudioRef.current) {
+      benchAudioRef.current.pause();
+    }
+    const benchAudio = new Audio('/2u.webm');
+    benchAudio.loop = true;
+    benchAudio.volume = 0.5;
+    benchAudio.play().catch(e => console.log('Bench audio play failed:', e));
+    benchAudioRef.current = benchAudio;
 
-    // Play Jungkook's cover of "2U"
-    benchAudioRef.current = new Audio('/2u.webm');
-    benchAudioRef.current.volume = 0.55;
-    benchAudioRef.current.loop = true;
-    benchAudioRef.current.play().catch((e) => {
-      console.log("Failed to play meditative bench audio:", e);
-    });
+    // Auto-pop motivating text every 8 seconds
+    if (benchMotivatingTimerRef.current) clearInterval(benchMotivatingTimerRef.current);
+    let msgIdx = 0;
+    setBenchMotivatingText(benchMotivatingMessages[msgIdx]);
+    benchMotivatingTimerRef.current = setInterval(() => {
+      msgIdx = (msgIdx + 1) % benchMotivatingMessages.length;
+      setBenchMotivatingText(null);
+      setTimeout(() => {
+        setBenchMotivatingText(benchMotivatingMessages[msgIdx]);
+      }, 600);
+    }, 7000);
   };
 
   const handleSittingExit = () => {
     setSittingOnBench(false);
     setHorizonStarBright(1.0);
+    setBenchMotivatingText(null);
     benchShootingStarRef.current = null;
     benchWhispersRef.current = [];
     benchParticlesRef.current = [];
 
-    // Stop meditative bench audio
+    // Clear motivating text timer
+    if (benchMotivatingTimerRef.current) {
+      clearInterval(benchMotivatingTimerRef.current);
+      benchMotivatingTimerRef.current = null;
+    }
+
+    // Stop meditative bench audio if it was playing
     if (benchAudioRef.current) {
       benchAudioRef.current.pause();
       benchAudioRef.current = null;
     }
   };
 
-  const handleBenchCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    const canvas = benchCanvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-
-    // Play soft synthesized chime chords
-    const notes = [
-      [261.63, 329.63, 392.00, 523.25], // C Maj
-      [349.23, 440.00, 523.25, 698.46], // F Maj
-      [293.66, 349.23, 440.00, 587.33], // D Min
-      [392.00, 493.88, 587.33, 783.99], // G Maj
-      [329.63, 392.00, 493.88, 659.25], // E Min
-      [440.00, 523.25, 659.25, 880.00]  // A Min
-    ];
-    const randomChord = notes[Math.floor(Math.random() * notes.length)];
-    playSynthesizedChime(randomChord);
-
-    // Spawn particle bursts at click point
-    for (let i = 0; i < 15; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = Math.random() * 1.5 + 0.5;
-      benchParticlesRef.current.push({
-        x: mx,
-        y: my,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed - 0.5,
-        alpha: 1.0,
-        size: Math.random() * 2.0 + 1.0,
-        color: Math.random() < 0.5 ? '#c084fc' : '#f2e3c6'
-      });
-    }
-
-    // Float rising text quotes (whispers/comfort messages)
-    const comfortWhispers = [
-      "You are exactly where you need to be, Sonakshi. 💜",
-      "Let the night sky hold your thoughts for a while.",
-      "The universe is quiet, just for you.",
-      "You've worked hard today. It's okay to rest.",
-      "Every star here is a reminder of how loved you are.",
-      "A quiet heart finds its own starlight.",
-      "Breathe in the calm, breathe out the noise. 🐰",
-      "Some paths are built in silence, step by step.",
-      "You are never truly walking alone under this canopy.",
-      "The Horizon Star is always watching over you."
-    ];
-    const randomWhisper = comfortWhispers[Math.floor(Math.random() * comfortWhispers.length)];
-    benchWhispersRef.current.push({
-      x: mx,
-      y: my,
-      text: randomWhisper,
-      alpha: 1.0,
-      yOffset: 0
-    });
-  };
+  // NOTE: Bench canvas is intentionally non-interactive.
+  // Motivating text auto-pops via the benchMotivatingTimerRef timer in handleSittingStart.
 
   // Sit timeline ticker
   useEffect(() => {
@@ -1434,7 +1692,10 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       ctx.fill();
 
       // Draw Jungkook & Sonakshi Silhouettes Sitting side-by-side on the bench
-      ctx.fillStyle = '#010005';
+      // Visible dark silhouette with purple-indigo tint and subtle glow
+      ctx.fillStyle = '#1a1238';
+      ctx.shadowColor = 'rgba(168, 85, 247, 0.35)';
+      ctx.shadowBlur = 12;
       const seatY = benchY;
 
       // Figure 1 (Jungkook - Left side of bench, benchX - 20)
@@ -1476,6 +1737,10 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       ctx.bezierCurveTo(sX - 6, seatY - 12, sX - 2, seatY - 25, sX, seatY - 29);
       ctx.closePath();
       ctx.fill();
+
+      // Reset shadow after silhouettes
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
 
       const auraGrad = ctx.createRadialGradient(benchX, seatY - 30, 5, benchX, seatY - 30, 45);
       auraGrad.addColorStop(0, 'rgba(168, 85, 247, 0.08)');
@@ -1570,6 +1835,8 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     setOpeningFutureGift(true);
     setFutureGiftStage(1); // Dialogue 1
     setCurrentGiftImageIndex(0);
+    setIsFutureGiftManual(false);
+    setFutureDone(true); // checklist requirement met instantly!
 
     // Play the epic orchestral 'Can't Help Falling in Love' when Future Vision opens
     if (benchAudioRef.current) {
@@ -1590,7 +1857,6 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     }, 12000);
     setTimeout(() => {
       setFutureGiftStage(5); // Show "We made the right choice"
-      setFutureDone(true); // checklist requirement met
     }, 75500); // 12s intro + 8 images x 7s = 68s
   };
 
@@ -1602,6 +1868,22 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       benchAudioRef.current.pause();
       benchAudioRef.current = null;
     }
+  };
+
+  const handleFutureGiftNext = () => {
+    setIsFutureGiftManual(true);
+    setCurrentGiftImageIndex((prev) => {
+      const nextIdx = Math.min(prev + 1, jungkookSylusImages.length - 1);
+      if (nextIdx === 8) {
+        setFutureGiftStage(5);
+      }
+      return nextIdx;
+    });
+  };
+
+  const handleFutureGiftPrev = () => {
+    setIsFutureGiftManual(true);
+    setCurrentGiftImageIndex((prev) => Math.max(prev - 1, 0));
   };
 
   // Cinematic stargazing canvas renderer inside Future Gift
@@ -1742,33 +2024,45 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
 
   // Image cycle effect for Future Gift stargazing slideshow
   useEffect(() => {
-    if (futureGiftStage < 4) return;
+    if (futureGiftStage < 4 || isFutureGiftManual) return;
     const interval = setInterval(() => {
       setCurrentGiftImageIndex((prev) => {
         if (prev >= 7) {
           clearInterval(interval);
+          setFutureGiftStage(5);
           return 8;
         }
         return prev + 1;
       });
     }, 7000);
     return () => clearInterval(interval);
-  }, [futureGiftStage]);
+  }, [futureGiftStage, isFutureGiftManual]);
 
   // Vinyl record rotation player
   const startVinylPlay = (song: string) => {
     setPlayingRecord(song);
     setMusicDone(true); // completed vinyl played checklist
 
-    if (stillWithYouAudioRef.current) stillWithYouAudioRef.current.pause();
+    if (stillWithYouAudioRef.current) {
+      stillWithYouAudioRef.current.pause();
+      stillWithYouAudioRef.current = null;
+    }
     if (recordRotationIntervalRef.current) clearInterval(recordRotationIntervalRef.current);
 
-    if (song === 'Still With You') {
-      stillWithYouAudioRef.current = new Audio('/still_with_you.webm');
+    const songMap: Record<string, string> = {
+      'Still With You': '/still_with_you.webm',
+      'Euphoria': '/euphoria.webm',
+      'My You': '/my_you.webm',
+      'Seven': '/seven.webm',
+      'Standing Next To You': '/standing_next_to_you.webm'
+    };
+
+    if (songMap[song]) {
+      stillWithYouAudioRef.current = new Audio(songMap[song]);
       stillWithYouAudioRef.current.volume = 0.6;
       stillWithYouAudioRef.current.play().catch(() => {
-        console.log("WebGL Audio failed, playing synth chord instead");
-        playSongInstrumental('Still With You');
+        console.log("Audio failed, playing synth chord instead");
+        playSongInstrumental(song);
       });
     } else {
       // play synthesized beautiful space arpeggio loop
@@ -1800,43 +2094,279 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     playSynthesizedChime([329.63, 392.00, 523.25]); // chime note
   };
 
-  // Weather Window calculation
-  const getWindowWeather = () => {
-    const hr = new Date().getHours();
-    if (hr >= 6 && hr < 18) {
-      return {
-        title: "Golden Twilight",
-        desc: "Floating golden pollen drifts slowly across a warm apricot sky.",
-        gradient: "linear-gradient(to bottom, #d97706 0%, #f59e0b 60%, #312e81 100%)",
-        particles: "pollen"
-      };
-    } else if (hr >= 18 && hr < 22) {
-      return {
-        title: "Cosmic Twilight",
-        desc: "Glowing golden fireflies gather underneath early evening stars.",
-        gradient: "linear-gradient(to bottom, #1e1b4b 0%, #312e81 60%, #0c0a1f 100%)",
-        particles: "fireflies"
-      };
-    } else {
-      return {
-        title: "Starry Midnight",
-        desc: "Gentle cosmic snowflakes fall silently beneath the silver crescent moon.",
-        gradient: "linear-gradient(to bottom, #020008 0%, #0c0a22 70%, #030009 100%)",
-        particles: "snow"
-      };
+  const weatherPresets: Record<string, { title: string; desc: string; gradient: string; particles: string }> = {
+    golden: {
+      title: "Golden Twilight",
+      desc: "Floating golden pollen drifts slowly across a warm apricot sky.",
+      gradient: "linear-gradient(to bottom, #d97706 0%, #f59e0b 60%, #312e81 100%)",
+      particles: "pollen"
+    },
+    cosmic: {
+      title: "Cosmic Twilight",
+      desc: "Glowing golden fireflies gather underneath early evening stars.",
+      gradient: "linear-gradient(to bottom, #1e1b4b 0%, #312e81 60%, #0c0a1f 100%)",
+      particles: "fireflies"
+    },
+    starry: {
+      title: "Starry Midnight",
+      desc: "Gentle cosmic snowflakes fall silently beneath the silver crescent moon.",
+      gradient: "linear-gradient(to bottom, #020008 0%, #0c0a22 70%, #030009 100%)",
+      particles: "snow"
+    },
+    rainy: {
+      title: "Rainy Night",
+      desc: "Soft rain taps against the glass, filling the room with a calm, quiet rhythm.",
+      gradient: "linear-gradient(to bottom, #090a14 0%, #0d1226 70%, #030408 100%)",
+      particles: "rain"
+    },
+    fireplace: {
+      title: "Cozy Fireplace",
+      desc: "A warm crackling fire casts soft, dancing golden embers across the floor.",
+      gradient: "linear-gradient(to bottom, #1c0a06 0%, #361407 60%, #080302 100%)",
+      particles: "embers"
+    },
+    cherry: {
+      title: "Spring Blossoms",
+      desc: "Delicate pink cherry blossoms drift gently on a warm spring breeze.",
+      gradient: "linear-gradient(to bottom, #2a1635 0%, #4a2559 60%, #1a0d24 100%)",
+      particles: "blossom"
     }
   };
-  const weather = getWindowWeather();
+
+  const [activeWeatherKey, setActiveWeatherKey] = useState<string>('starry');
+  const [ambientAudioPlaying, setAmbientAudioPlaying] = useState(false);
+  const weatherAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Set default weather based on time of day on mount
+  useEffect(() => {
+    const hr = new Date().getHours();
+    if (hr >= 6 && hr < 18) {
+      setActiveWeatherKey('golden');
+    } else if (hr >= 18 && hr < 22) {
+      setActiveWeatherKey('cosmic');
+    } else {
+      setActiveWeatherKey('starry');
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (weatherAudioRef.current) {
+        weatherAudioRef.current.pause();
+      }
+    };
+  }, []);
+
+  const handleWeatherChange = (key: string) => {
+    setActiveWeatherKey(key);
+    
+    // Stop current weather audio
+    if (weatherAudioRef.current) {
+      weatherAudioRef.current.pause();
+      weatherAudioRef.current = null;
+    }
+
+    const musicMap: Record<string, { file: string, vol: number }> = {
+      rainy: { file: '/ambient/rain_roof.ogg', vol: 0.35 },
+      fireplace: { file: '/ambient/fire.ogg', vol: 0.4 },
+      golden: { file: '/ambient/birds.ogg', vol: 0.25 },
+      cosmic: { file: '/ambient/crickets.ogg', vol: 0.4 },
+      starry: { file: '/ambient/waves.ogg', vol: 0.25 },
+      cherry: { file: '/ambient/stream.ogg', vol: 0.3 }
+    };
+
+    const track = musicMap[key];
+    if (track) {
+      const audio = new Audio(track.file);
+      audio.loop = true;
+      audio.volume = track.vol;
+      audio.play().then(() => {
+        setAmbientAudioPlaying(true);
+      }).catch(e => console.log("Weather ambient play failed", e));
+      weatherAudioRef.current = audio;
+    } else {
+      setAmbientAudioPlaying(false);
+    }
+  };
+
+  const weather = weatherPresets[activeWeatherKey] || weatherPresets['starry'];
+
+  const renderRoomWindow = () => (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        gap: '12px',
+        width: '100%',
+        height: '100%',
+        padding: '24px 0'
+      }}
+    >
+      <div
+        style={{
+          flex: 1,
+          minHeight: '240px',
+          borderRadius: '8px',
+          background: weather.gradient,
+          border: '3px solid #2a203b',
+          boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8), 0 4px 15px rgba(0,0,0,0.5)',
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <div style={{ position: 'absolute', top: 0, bottom: 0, left: '50%', width: '4px', background: '#2a203b', zIndex: 5 }}></div>
+        <div style={{ position: 'absolute', left: 0, right: 0, top: '50%', height: '4px', background: '#2a203b', zIndex: 5 }}></div>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%)', zIndex: 6 }}></div>
+        
+        <style>{`
+          @keyframes windowRainFall {
+            0% { transform: translateY(-20px) scaleY(1); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translateY(160px) scaleY(1.5); opacity: 0; }
+          }
+          @keyframes windowEmberRise {
+            0% { transform: translateY(140px) scale(1) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.9; }
+            100% { transform: translateY(-20px) scale(0.2) rotate(45deg); opacity: 0; }
+          }
+          @keyframes windowPollenDrift {
+            0% { transform: translate(-20px, -20px); opacity: 0; }
+            20% { opacity: 0.8; }
+            80% { opacity: 0.8; }
+            100% { transform: translate(60px, 120px); opacity: 0; }
+          }
+          @keyframes windowStarTwinkle {
+            0% { opacity: 0.1; transform: scale(0.6); }
+            50% { opacity: 1; transform: scale(1.3); }
+            100% { opacity: 0.1; transform: scale(0.6); }
+          }
+          @keyframes windowBlossomDrift {
+            0% { transform: translate(-10px, -20px) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.9; }
+            80% { opacity: 0.9; }
+            100% { transform: translate(40px, 150px) rotate(180deg); opacity: 0; }
+          }
+        `}</style>
+        
+        {weather.particles === 'rain' && Array.from({ length: 40 }).map((_, i) => (
+          <div key={`rain-${i}`} style={{
+            position: 'absolute', left: `${Math.random() * 100}%`, top: `${Math.random() * -20}%`,
+            width: '1px', height: `${Math.random() * 15 + 10}px`,
+            background: 'linear-gradient(transparent, rgba(180, 210, 255, 0.9))',
+            animation: `windowRainFall ${Math.random() * 0.4 + 0.4}s linear infinite`, animationDelay: `${Math.random() * 2}s`, zIndex: 2
+          }} />
+        ))}
+
+        {weather.particles === 'embers' && (
+          <>
+            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '50px', background: 'linear-gradient(transparent, rgba(255, 90, 0, 0.4))', zIndex: 1 }} />
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div key={`ember-${i}`} style={{
+                position: 'absolute', left: `${Math.random() * 100}%`, bottom: '-10px',
+                width: `${Math.random() * 5 + 2}px`, height: `${Math.random() * 5 + 2}px`, borderRadius: '50%',
+                background: Math.random() > 0.4 ? '#ff6600' : '#ffcc00', boxShadow: '0 0 10px #ff5500',
+                animation: `windowEmberRise ${Math.random() * 2 + 1.5}s ease-in infinite`, animationDelay: `${Math.random() * 3}s`, zIndex: 2
+              }} />
+            ))}
+          </>
+        )}
+
+        {weather.particles === 'pollen' && Array.from({ length: 25 }).map((_, i) => (
+          <div key={`pollen-${i}`} style={{
+            position: 'absolute', left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+            width: `${Math.random() * 4 + 2}px`, height: `${Math.random() * 4 + 2}px`, borderRadius: '50%',
+            background: '#ffd700', boxShadow: '0 0 8px #ffd700',
+            animation: `windowPollenDrift ${Math.random() * 4 + 3}s linear infinite`, animationDelay: `${Math.random() * 4}s`, zIndex: 2
+          }} />
+        ))}
+
+        {weather.particles === 'blossom' && Array.from({ length: 25 }).map((_, i) => (
+          <div key={`blossom-${i}`} style={{
+            position: 'absolute', left: `${Math.random() * 100}%`, top: `${Math.random() * -20}%`,
+            width: `${Math.random() * 8 + 6}px`, height: `${Math.random() * 6 + 4}px`, borderRadius: '50% 0 50% 0',
+            background: 'rgba(252, 165, 165, 0.9)', boxShadow: '0 0 4px rgba(244, 114, 182, 0.6)',
+            animation: `windowBlossomDrift ${Math.random() * 3 + 4}s ease-in-out infinite`, animationDelay: `${Math.random() * 4}s`, zIndex: 2
+          }} />
+        ))}
+
+        {(weather.particles === 'fireflies' || weather.particles === 'snow') && Array.from({ length: 50 }).map((_, i) => (
+          <div key={`star-${i}`} style={{
+            position: 'absolute', left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`,
+            width: `${Math.random() * 2 + 1}px`, height: `${Math.random() * 2 + 1}px`, borderRadius: '50%',
+            background: weather.particles === 'fireflies' ? '#fffae6' : '#d0f0ff',
+            boxShadow: `0 0 ${Math.random() * 6 + 2}px ${weather.particles === 'fireflies' ? '#fffae6' : '#d0f0ff'}`,
+            animation: `windowStarTwinkle ${Math.random() * 3 + 1.5}s ease-in-out infinite`, animationDelay: `${Math.random() * 4}s`, zIndex: 2
+          }} />
+        ))}
+        {(activeWeatherKey === 'starry' || activeWeatherKey === 'cosmic') && (
+          <div style={{ position: 'absolute', top: '10px', right: '15px', width: '24px', height: '24px', borderRadius: '50%', background: '#fffae6', boxShadow: '0 0 15px #fffae6', zIndex: 1 }}></div>
+        )}
+      </div>
+
+      <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {Object.keys(weatherPresets).map((presetKey) => (
+          <button
+            key={presetKey}
+            onClick={() => handleWeatherChange(presetKey)}
+            className="interactive"
+            style={{
+              padding: '6px 10px', fontSize: '0.65rem', borderRadius: '6px',
+              background: activeWeatherKey === presetKey ? 'rgba(168, 85, 247, 0.3)' : 'rgba(255,255,255,0.04)',
+              border: activeWeatherKey === presetKey ? '1px solid rgba(168, 85, 247, 0.5)' : '1px solid rgba(255,255,255,0.08)',
+              color: activeWeatherKey === presetKey ? '#fff' : 'var(--text-secondary)', cursor: 'pointer', transition: 'all 0.2s'
+            }}
+          >
+            {presetKey.toUpperCase()}
+          </button>
+        ))}
+        <button
+          onClick={(e) => {
+              e.stopPropagation();
+              if (weatherAudioRef.current) {
+                if (ambientAudioPlaying) {
+                  weatherAudioRef.current.pause();
+                  setAmbientAudioPlaying(false);
+                } else {
+                  weatherAudioRef.current.play().catch(() => {});
+                  setAmbientAudioPlaying(true);
+                }
+              }
+            }}
+            className="interactive"
+            style={{
+              padding: '6px 10px', fontSize: '0.65rem', borderRadius: '6px',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: '#e9d5ff', cursor: 'pointer', transition: 'all 0.2s',
+              display: 'flex', alignItems: 'center', gap: '4px'
+            }}
+          >
+            {ambientAudioPlaying ? '🔊 SOUND OFF' : '🔇 SOUND ON'}
+          </button>
+      </div>
+    </div>
+  );
 
   return (
     <div
+      onScroll={handleScroll}
+      onClick={(e) => {
+        if (e.target === e.currentTarget || (e.target as HTMLElement).tagName.toLowerCase() === 'section') {
+          handleCanvasClick(e);
+        }
+      }}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#05030a',
+        backgroundColor: 'transparent',
         color: '#fff',
         zIndex: 99999,
         overflowY: sittingOnBench || openingFutureGift ? 'hidden' : 'auto',
@@ -1941,12 +2471,14 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               >
                 {/* Click zone ring */}
                 <div
+                  className={isTarget ? "animate-pulse-slow" : ""}
                   style={{
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: 'transparent',
+                    backgroundColor: isTarget ? 'rgba(168, 85, 247, 0.15)' : 'transparent',
                     border: isTarget ? '1.5px solid var(--purple-accent)' : 'none',
+                    boxShadow: isTarget ? '0 0 25px 5px rgba(168, 85, 247, 0.6), inset 0 0 12px rgba(168, 85, 247, 0.4)' : 'none',
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -2050,11 +2582,19 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           )}
 
           {/* Interactive instruction text */}
-          <div style={{ textAlign: 'center', zIndex: 10, maxWidth: '600px' }}>
+          <div style={{ 
+            position: 'relative', 
+            textAlign: 'center', 
+            zIndex: 10, 
+            maxWidth: '640px',
+            padding: '40px',
+            background: 'radial-gradient(ellipse at center, rgba(5, 3, 10, 0.9) 25%, rgba(5, 3, 10, 0) 70%)',
+            borderRadius: '50%'
+          }}>
             <h1 style={{ fontSize: '2.5rem', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', textShadow: '0 3px 20px rgba(0,0,0,0.9)' }}>
               Jungkook Constellation
             </h1>
-            <p style={{ color: 'var(--purple-accent)', fontStyle: 'italic', fontSize: '1.1rem', margin: '12px 0 32px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
+            <p style={{ color: 'var(--purple-accent)', fontStyle: 'italic', fontSize: '1.1rem', margin: '12px auto 32px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
               "Some stars don't just shine. They become part of your sky."
             </p>
             
@@ -2089,13 +2629,13 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
 
       {/* 3. SCROLLABLE FEATURES AREA */}
       {!sittingOnBench && !openingFutureGift && (
-        <div style={{ position: 'relative', zIndex: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '100px', paddingBottom: '120px' }}>
+        <div style={{ position: 'relative', zIndex: 10, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '100px', paddingBottom: '120px', pointerEvents: 'none' }}>
           
           {/* Dashboard Hub control connector */}
           <div id="dashboard-hub" style={{ height: '2px' }} />
 
           {/* FEATURE 1: PERSONAL DIARY & MAILBOX */}
-          <div id="section-diary" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(12px)' }}>
+          <div id="section-diary" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap' }}>
               {/* Virtual Diary Book */}
               <div style={{ flex: 1, minWidth: '340px', textAlign: 'left' }}>
@@ -2105,26 +2645,50 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                   Write letters, memories, or daily thoughts to Jungkook. Every thought saves automatically to your localStorage journal.
                 </p>
 
-                <textarea
-                  value={diaryText}
-                  onChange={(e) => setDiaryText(e.target.value)}
-                  placeholder="Dear Jungkook, today I was thinking about..."
-                  style={{
-                    width: '100%',
-                    height: '180px',
-                    background: 'rgba(0,0,0,0.3)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    padding: '16px',
-                    fontSize: '0.9rem',
-                    fontFamily: 'inherit',
-                    resize: 'none',
-                    outline: 'none',
-                    marginBottom: '16px',
-                    lineHeight: '1.7'
-                  }}
-                />
+                <div style={{
+                  background: 'linear-gradient(135deg, #1c152b 0%, #0d0a14 100%)',
+                  borderRadius: '4px 16px 16px 4px',
+                  boxShadow: 'inset -5px 0 15px rgba(0,0,0,0.5), 8px 15px 25px rgba(0,0,0,0.8)',
+                  borderLeft: '14px solid #0f0b17',
+                  padding: '30px 40px',
+                  position: 'relative',
+                  marginBottom: '20px'
+                }}>
+                  {/* Ribbon bookmark */}
+                  <div style={{ 
+                    position: 'absolute', 
+                    top: '-5px', 
+                    right: '45px', 
+                    width: '18px', 
+                    height: '50px', 
+                    background: 'linear-gradient(to bottom, #7c3aed, #4c1d95)',
+                    boxShadow: '2px 2px 8px rgba(0,0,0,0.6)',
+                    borderRadius: '0 0 4px 4px',
+                    zIndex: 2
+                  }} />
+                  
+                  <textarea
+                    value={diaryText}
+                    onChange={(e) => setDiaryText(e.target.value)}
+                    placeholder="Dear Jungkook, today I was thinking about..."
+                    spellCheck="false"
+                    style={{
+                      width: '100%',
+                      height: '240px',
+                      background: 'transparent',
+                      backgroundImage: 'repeating-linear-gradient(transparent, transparent 31px, rgba(168, 85, 247, 0.15) 31px, rgba(168, 85, 247, 0.15) 32px)',
+                      border: 'none',
+                      color: '#e9d5ff',
+                      padding: '4px 8px',
+                      fontSize: '1.4rem',
+                      fontFamily: "'Caveat', cursive",
+                      resize: 'none',
+                      outline: 'none',
+                      lineHeight: '32px',
+                      letterSpacing: '0.05em'
+                    }}
+                  />
+                </div>
                 
                 <button
                   onClick={handleSaveDiary}
@@ -2205,129 +2769,54 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                     ))}
                   </div>
                 )}
+
+                {/* AI Chat Button Panel embedded in Mailbox */}
+                <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '1px dashed rgba(168, 85, 247, 0.2)' }}>
+                  <h4 style={{ fontSize: '0.85rem', color: '#fff', margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={14} color="var(--purple-accent)" /> Private Constellation Chat
+                  </h4>
+                  <button
+                    onClick={() => setShowJKChat(true)}
+                    className="interactive"
+                    style={{
+                      width: '100%',
+                      textAlign: 'center',
+                      background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.15))',
+                      border: '1.5px solid rgba(168, 85, 247, 0.35)',
+                      color: '#e9d5ff',
+                      padding: '12px 0',
+                      borderRadius: '12px',
+                      fontSize: '0.85rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.05em',
+                      display: 'block',
+                      boxShadow: '0 0 15px rgba(168, 85, 247, 0.15)',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(139, 92, 246, 0.25))';
+                      e.currentTarget.style.boxShadow = '0 0 25px rgba(168, 85, 247, 0.35)';
+                      e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.6)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(139, 92, 246, 0.15))';
+                      e.currentTarget.style.boxShadow = '0 0 15px rgba(168, 85, 247, 0.15)';
+                      e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.35)';
+                    }}
+                  >
+                    🐰 Talk to Jungkook
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* FEATURE 2: JUNGKOOK'S ROOM */}
-          <div id="section-room" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(10, 8, 22, 0.7)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
-            <div style={{ textAlign: 'left', marginBottom: '28px' }}>
-              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE II</span>
-              <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 8px', fontFamily: 'var(--font-serif-display)' }}>Jungkook's Cozy Sanctuary</h2>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>A starry room dedicated to quotes, voice notes, letters, and portals.</p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px' }}>
-              {/* Window & Climate Weather display */}
-              <div className="glass-panel" style={{ padding: '24px', background: 'rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '220px' }}>
-                <div>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--purple-accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>The Room Window</span>
-                  <h4 style={{ color: '#fff', fontSize: '1.05rem', margin: '4px 0 8px' }}>{weather.title}</h4>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: '1.4' }}>{weather.desc}</p>
-                </div>
-                
-                {/* Visual Window Mock representing the climate gradient */}
-                <div
-                  style={{
-                    height: '90px',
-                    borderRadius: '8px',
-                    background: weather.gradient,
-                    border: '1.5px solid rgba(255,255,255,0.1)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                >
-                  {/* Weather specifics */}
-                  {weather.particles === 'snow' && (
-                    <div style={{ color: 'rgba(255,255,255,0.85)', fontSize: '1.5rem', animation: 'pulse-slow 2s infinite' }}>❄️</div>
-                  )}
-                  {weather.particles === 'fireflies' && (
-                    <div style={{ color: 'rgba(242,227,198,0.9)', fontSize: '1.5rem', animation: 'pulse-slow 1.5s infinite' }}>✨</div>
-                  )}
-                  {weather.particles === 'pollen' && (
-                    <div style={{ color: 'rgba(255, 218, 120, 0.8)', fontSize: '1.5rem', animation: 'pulse-slow 2.5s infinite' }}>🍂</div>
-                  )}
-                </div>
-              </div>
-
-              {/* Letter Wall envelopes */}
-              <div className="glass-panel" style={{ padding: '24px', background: 'rgba(0,0,0,0.25)' }}>
-                <span style={{ fontSize: '0.65rem', color: 'var(--purple-accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Letter Wall</span>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px' }}>
-                  {roomLetters.map((l, idx) => (
-                    <div
-                      key={idx}
-                      className="interactive"
-                      onClick={() => setActiveNoteText(l.text)}
-                      style={{
-                        background: 'rgba(255,255,255,0.03)',
-                        border: '1px solid rgba(255,255,255,0.06)',
-                        padding: '10px 14px',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.06)'}
-                      onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.03)'}
-                    >
-                      <span style={{ fontSize: '0.8rem', color: '#eee', fontWeight: 500 }}>{l.title}</span>
-                      <span style={{ fontSize: '0.65rem', color: 'var(--purple-accent)' }}>Open envelope</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Favorite Quotes & Link */}
-              <div className="glass-panel" style={{ padding: '24px', background: 'rgba(0,0,0,0.25)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                <div>
-                  <span style={{ fontSize: '0.65rem', color: 'var(--purple-accent)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Sanctuary Quotes</span>
-                  <div style={{ marginTop: '10px', maxHeight: '110px', overflowY: 'auto' }}>
-                    {roomQuotes.map((q, idx) => (
-                      <p key={idx} style={{ fontSize: '0.75rem', color: '#9c92ac', fontStyle: 'italic', margin: '6px 0', borderBottom: '1.5px solid rgba(255,255,255,0.02)', paddingBottom: '4px' }}>
-                        "{q}"
-                      </p>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Link portal styled as "A Door Between Worlds" */}
-                <a
-                  href="https://character.ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="interactive"
-                  style={{
-                    alignSelf: 'stretch',
-                    textAlign: 'center',
-                    background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.2))',
-                    border: '1.5px solid rgba(168, 85, 247, 0.4)',
-                    color: 'var(--purple-accent)',
-                    padding: '8px 0',
-                    borderRadius: '12px',
-                    fontSize: '0.75rem',
-                    fontWeight: 600,
-                    textDecoration: 'none',
-                    display: 'block',
-                    boxShadow: '0 0 10px rgba(168, 85, 247, 0.15)',
-                    marginTop: '12px'
-                  }}
-                >
-                  🚪 A Door Between Worlds →
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {/* FEATURE 3: FUTURE GIFT & BENCH */}
-          <div id="section-gift" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+          {/* FEATURE 2: FUTURE GIFT & BENCH */}
+          <div id="section-gift" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ flex: 1, minWidth: '340px', textAlign: 'left' }}>
-                <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE III</span>
+                <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE II</span>
                 <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 20px', fontFamily: 'var(--font-serif-display)' }}>Future Gift & Reflection Bench</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '24px' }}>
                   Explore a cinematic vision from the future, or take a seat on the glowing constellation bench beside the cosmic lake to rest in silence.
@@ -2394,10 +2883,10 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             </div>
           </div>
 
-          {/* FEATURE 4: INFINITE SCRAPBOOK MEMORY WALL */}
-          <div id="section-wall" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden' }}>
+          {/* FEATURE 3: INFINITE SCRAPBOOK MEMORY WALL */}
+          <div id="section-wall" style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', overflow: 'hidden', pointerEvents: 'none' }}>
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
-              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE IV</span>
+              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE III</span>
               <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 8px', fontFamily: 'var(--font-serif-display)' }}>Infinite Memory Wall</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>A living, endless scrapbook loop of comfort quotes, polaroids, and logs.</p>
             </div>
@@ -2424,35 +2913,21 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                 borderTop: '1px solid rgba(255,255,255,0.03)',
                 borderBottom: '1px solid rgba(255,255,255,0.03)',
                 scrollbarWidth: 'none', // Hide default scrollbar
-                scrollBehavior: 'auto'
+                scrollBehavior: 'auto',
+                pointerEvents: 'auto'
               }}
             >
               {/* Loop the items list four times to ensure infinite recycling bounds */}
-              {Array.from({ length: 4 }).flatMap(() => [
-                { id: 1, type: 'polaroid', title: "BBMAs Stage", desc: "Shining brightly under the Billboard lights.", imageUrl: "/media/jungkook/jk1.jpg", rot: -3, scale: 0.95 },
-                { id: 2, type: 'quote', text: "Effort makes you. You will regret someday if you don't do your best now. — JK", rot: 2, scale: 1.0 },
-                { id: 3, type: 'note', text: "Still With You loops late at night during cold winter days.", emoji: "🎧🎹", rot: -1, scale: 0.92 },
-                { id: 4, type: 'polaroid', title: "Love Yourself LA Tour", desc: "Singing beneath a wave of purple lights.", imageUrl: "/media/jungkook/jk2.jpg", rot: 4, scale: 1.05 },
-                { id: 5, type: 'quote', text: "Whenever ARMY misses me, you can come here. I will be singing. — JK", rot: -2, scale: 0.98 },
-                { id: 6, type: 'note', text: "The first song you played in the constellation room.", emoji: "🌌📻", rot: 1, scale: 1.02 },
-                { id: 7, type: 'polaroid', title: "Berlin Fake Love Live", desc: "Deep emotions and stellar vocals.", imageUrl: "/media/jungkook/jk3.jpg", rot: -2, scale: 0.96 },
-                { id: 8, type: 'quote', text: "Don't do anything you don't like. Just do whatever you want. — JK", rot: 3, scale: 1.01 },
-                { id: 9, type: 'polaroid', title: "Order of Cultural Merit", desc: "A historic moment of gratitude.", imageUrl: "/media/jungkook/jk4.jpg", rot: -4, scale: 0.98 },
-                { id: 10, type: 'note', text: "A quiet reminder: May your dreams stay bigger than your fears.", emoji: "💜✨", rot: 2, scale: 0.94 },
-                { id: 11, type: 'polaroid', title: "Myeongdong Fanmeet", desc: "Sharing sweet smiles with the crowd.", imageUrl: "/media/jungkook/jk5.jpg", rot: 3, scale: 1.02 },
-                { id: 12, type: 'polaroid', title: "Epilogue Concert Stage", desc: "Lost in the memories of the most beautiful moments.", imageUrl: "/media/jungkook/jk6.jpg", rot: -1, scale: 0.95 },
-                { id: 13, type: 'polaroid', title: "Global VLive Awards", desc: "Receiving love from stars around the world.", imageUrl: "/media/jungkook/jk7.jpg", rot: 2, scale: 0.97 },
-                { id: 14, type: 'polaroid', title: "Melon Music Awards", desc: "An emotional and legendary performance look.", imageUrl: "/media/jungkook/jk8.jpg", rot: -3, scale: 0.94 },
-                { id: 15, type: 'polaroid', title: "Debut Days Fansign", desc: "Looking back at the very beginning of the journey.", imageUrl: "/media/jungkook/jk9.jpg", rot: 1, scale: 1.03 },
-                { id: 16, type: 'polaroid', title: "Wings Tour Manila", desc: "Spreading wings across the night sky.", imageUrl: "/media/jungkook/jk10.jpg", rot: -2, scale: 0.96 }
-              ]).map((item, idx) => (
+              {Array.from({ length: 4 }).flatMap((_, loopIdx) => 
+                scrapbookItems.map(item => ({ ...item, uniqueKey: `${loopIdx}-${item.id}` }))
+              ).map((item: any, idx) => (
                 <div
-                  key={idx}
+                  key={item.uniqueKey}
                   className="glass-panel interactive"
                   style={{
-                    minWidth: '240px',
-                    maxWidth: '240px',
-                    height: '260px',
+                    minWidth: '260px',
+                    maxWidth: '260px',
+                    height: '290px',
                     padding: '20px',
                     background: 'rgba(15, 10, 28, 0.75)',
                     border: '1.5px solid rgba(168, 85, 247, 0.1)',
@@ -2477,7 +2952,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                 >
                   {item.type === 'polaroid' ? (
                     <>
-                      <div style={{ height: '130px', background: 'linear-gradient(135deg, #1e0b36 0%, #05030d 100%)', borderRadius: '4px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2.8rem', border: '1px solid rgba(255,255,255,0.03)', overflow: 'hidden' }}>
+                      <div style={{ height: '160px', background: 'linear-gradient(135deg, #1e0b36 0%, #05030d 100%)', borderRadius: '4px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2.8rem', border: '1px solid rgba(255,255,255,0.03)', overflow: 'hidden' }}>
                         {item.imageUrl ? (
                           <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
@@ -2511,10 +2986,10 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             </div>
           </div>
 
-          {/* FEATURE 5: VIDEO VAULT — Local Vlive Clips */}
-          <div id="section-vault" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(10, 8, 22, 0.7)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+          {/* FEATURE 4: VIDEO VAULT — Local Vlive Clips */}
+          <div id="section-vault" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(10, 8, 22, 0.7)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ textAlign: 'left', marginBottom: '32px' }}>
-              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE V</span>
+              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE IV</span>
               <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 8px', fontFamily: 'var(--font-serif-display)' }}>Cozy Cosmic Theater</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Jungkook singing live — vlive moments, cozy and real. Click to play.</p>
             </div>
@@ -2562,12 +3037,12 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             )}
 
             {/* Video Cards Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '20px' }}>
+            <div className="video-grid">
               {vliveVideos.map((vid, idx) => (
                 <div
                   key={idx}
                   className="glass-panel interactive"
-                  onClick={() => setActiveVliveVideo(vid)}
+                  onClick={() => handlePlayVliveVideo(vid)}
                   style={{
                     padding: '20px',
                     background: activeVliveVideo?.file === vid.file ? 'rgba(168,85,247,0.12)' : 'rgba(0,0,0,0.3)',
@@ -2600,7 +3075,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           </div>
 
           {/* FEATURE 6: MUSIC ROOM (VINYL PLAYER) */}
-          <div id="section-music" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+          <div id="section-music" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', alignItems: 'center' }}>
               
               {/* Rotating Vinyl Mock */}
@@ -2650,7 +3125,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
 
               {/* Tracks List */}
               <div style={{ flex: 1.2, minWidth: '280px', textAlign: 'left' }}>
-                <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE VI</span>
+                <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE V</span>
                 <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 12px', fontFamily: 'var(--font-serif-display)' }}>Cosmic Vinyl Player</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
                   Select a record to rotate the vinyl and listen to comforting melodies.
@@ -2690,10 +3165,10 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             </div>
           </div>
 
-          {/* FEATURE 9: WISH CONSTELLATION */}
-          <div id="section-wishes" className="glass-panel" style={{ width: '90%', maxWidth: '850px', padding: '40px', background: 'rgba(10, 8, 22, 0.7)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)' }}>
+          {/* FEATURE 6: WISH CONSTELLATION */}
+          <div id="section-wishes" className="glass-panel" style={{ width: '90%', maxWidth: '850px', padding: '40px', background: 'rgba(10, 8, 22, 0.7)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ textAlign: 'left', marginBottom: '20px' }}>
-              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE IX</span>
+              <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE VI</span>
               <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 8px', fontFamily: 'var(--font-serif-display)' }}>Wish Constellation Canopy</h2>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6' }}>
                 Tap the blank spaces on the background night sky above to spawn glowing stars and write a custom birthday wish.
@@ -2834,6 +3309,9 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
         );
       })}
 
+
+
+
       {/* 7. CINEMATIC MEDITATIVE BENCH FULLSCREEN CANVAS */}
       {sittingOnBench && (
         <div
@@ -2853,9 +3331,40 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
         >
           <canvas
             ref={benchCanvasRef}
-            onClick={handleBenchCanvasClick}
-            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', cursor: 'pointer' }}
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', cursor: 'default', pointerEvents: 'none' }}
           />
+
+          {/* Auto-popping motivating text */}
+          {benchMotivatingText && (
+            <div
+              key={benchMotivatingText}
+              style={{
+                position: 'absolute',
+                top: '25%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                textAlign: 'center',
+                zIndex: 200,
+                pointerEvents: 'none',
+                animation: 'fade-in 0.8s ease-out',
+                maxWidth: '520px',
+                padding: '0 24px',
+              }}
+            >
+              <p style={{
+                color: 'rgba(242, 227, 198, 0.9)',
+                fontSize: '1.05rem',
+                letterSpacing: '0.08em',
+                fontStyle: 'italic',
+                fontFamily: "'Lora', serif",
+                textShadow: '0 2px 12px rgba(0,0,0,0.95), 0 0 20px rgba(168,85,247,0.2)',
+                lineHeight: 1.7,
+                margin: 0
+              }}>
+                {benchMotivatingText}
+              </p>
+            </div>
+          )}
 
           {/* Timed Meditate 30s Text */}
           {benchTextFade && (
@@ -2976,10 +3485,12 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
-                        objectPosition: 'center',
+                        objectPosition: imgIdx === 8 ? 'center top' : 'center',
                         opacity: currentGiftImageIndex === imgIdx ? 1 : 0,
                         transition: 'opacity 2.5s ease-in-out',
-                        filter: 'brightness(0.82)'
+                        filter: imgIdx === 8
+                          ? 'contrast(1.04) brightness(1.04) saturate(1.06)'
+                          : 'brightness(0.82)'
                       }}
                     />
                   ))}
@@ -2990,6 +3501,52 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                     width: '120px', height: '100%',
                     background: 'linear-gradient(to right, transparent, #030209)'
                   }} />
+
+                  {/* Manual Controls */}
+                  <div style={{
+                    position: 'absolute', bottom: '56px', left: '32px',
+                    display: 'flex', gap: '12px', alignItems: 'center',
+                    zIndex: 60
+                  }}>
+                    <button
+                      onClick={handleFutureGiftPrev}
+                      disabled={currentGiftImageIndex === 0}
+                      className="interactive"
+                      style={{
+                        background: 'rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        color: currentGiftImageIndex === 0 ? 'rgba(255,255,255,0.25)' : '#f2e3c6',
+                        padding: '6px 14px',
+                        borderRadius: '12px',
+                        fontSize: '0.72rem',
+                        cursor: currentGiftImageIndex === 0 ? 'default' : 'pointer',
+                        transition: 'all 0.2s',
+                        backdropFilter: 'blur(8px)',
+                        pointerEvents: 'auto'
+                      }}
+                    >
+                      ← Prev
+                    </button>
+                    <button
+                      onClick={handleFutureGiftNext}
+                      disabled={currentGiftImageIndex === jungkookSylusImages.length - 1}
+                      className="interactive"
+                      style={{
+                        background: 'rgba(0,0,0,0.5)',
+                        border: '1px solid rgba(255,255,255,0.15)',
+                        color: currentGiftImageIndex === jungkookSylusImages.length - 1 ? 'rgba(255,255,255,0.25)' : '#f2e3c6',
+                        padding: '6px 14px',
+                        borderRadius: '12px',
+                        fontSize: '0.72rem',
+                        cursor: currentGiftImageIndex === jungkookSylusImages.length - 1 ? 'default' : 'pointer',
+                        transition: 'all 0.2s',
+                        backdropFilter: 'blur(8px)',
+                        pointerEvents: 'auto'
+                      }}
+                    >
+                      Next →
+                    </button>
+                  </div>
 
                   {/* Bottom overlay — image counter */}
                   <div style={{
@@ -3072,19 +3629,13 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                   }} />
 
                   {/* Current description — large and readable, all stacked in same space */}
-                  <div style={{ position: 'relative', minHeight: '180px', flex: 1 }}>
+                  <div style={{ minHeight: '180px', flex: '1 0 auto' }}>
                     {momentDescriptions.map((desc, idx) => (
                       <div
                         key={idx}
+                        className={currentGiftImageIndex === idx ? "animate-fade-in-up" : ""}
                         style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          opacity: currentGiftImageIndex === idx ? 1 : 0,
-                          transform: currentGiftImageIndex === idx ? 'translateY(0px)' : 'translateY(14px)',
-                          transition: 'opacity 1.8s ease, transform 1.8s ease',
-                          pointerEvents: currentGiftImageIndex === idx ? 'auto' : 'none',
+                          display: currentGiftImageIndex === idx ? 'block' : 'none'
                         }}
                       >
                         <p style={{
@@ -3214,6 +3765,247 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           </div>
         </div>
       )}
+
+      {/* JK AI CHAT OVERLAY - C.AI style */}
+      {showJKChat && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0, right: 0,
+            width: '100vw', height: '100vh',
+            background: 'rgba(4, 3, 10, 0.5)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 999999999,
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'stretch',
+            padding: '32px',
+            gap: '32px',
+            animation: 'fade-in 0.3s'
+          }}
+        >
+          {window.innerWidth > 900 && (
+            <div
+              className="chat-window-sidebar"
+              style={{
+                flex: 1,
+                minWidth: '400px',
+                maxWidth: '650px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              {renderRoomWindow()}
+            </div>
+          )}
+
+          <div style={{
+            flex: 1,
+            width: '100%',
+            maxWidth: '680px',
+            height: '100%',
+            maxHeight: '90vh',
+            borderRadius: '24px',
+            background: 'linear-gradient(160deg, #0d0b1e 0%, #140f28 100%)',
+            border: '1px solid rgba(168, 85, 247, 0.2)',
+            boxShadow: '0 0 60px rgba(168, 85, 247, 0.12), 0 32px 80px rgba(0,0,0,0.6)',
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+          }}>
+            {/* Chat Header */}
+            <div style={{
+              padding: '20px 24px',
+              borderBottom: '1px solid rgba(168, 85, 247, 0.12)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '16px',
+              background: 'rgba(168, 85, 247, 0.06)'
+            }}>
+              {/* JK Avatar */}
+              <div style={{
+                width: '48px', height: '48px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #7c3aed, #a855f7)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '1.4rem',
+                boxShadow: '0 0 16px rgba(168, 85, 247, 0.4)',
+                flexShrink: 0
+              }}>
+                🐰
+              </div>
+              <div style={{ flex: 1 }}>
+                <h3 style={{ margin: 0, color: '#fff', fontSize: '1rem', fontWeight: 600 }}>Jungkook</h3>
+                <p style={{ margin: 0, color: '#a855f7', fontSize: '0.72rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#4ade80', display: 'inline-block' }} />
+                  Here with you
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', padding: '3px 8px', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px' }}>AI Character</span>
+                <button
+                  onClick={() => setShowJKChat(false)}
+                  style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.4)', fontSize: '1.4rem', cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}
+                >×</button>
+              </div>
+            </div>
+
+            {/* Messages Area */}
+            <div style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '24px 20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              scrollbarWidth: 'thin',
+              scrollbarColor: 'rgba(168,85,247,0.2) transparent'
+            }}>
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} style={{
+                  display: 'flex',
+                  justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
+                  gap: '10px',
+                  alignItems: 'flex-end'
+                }}>
+                  {msg.role === 'jk' && (
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem', flexShrink: 0 }}>🐰</div>
+                  )}
+                  <div style={{ maxWidth: '72%', order: msg.role === 'user' ? 1 : 2 }}>
+                    <div style={{
+                      padding: '12px 16px',
+                      borderRadius: msg.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                      background: msg.role === 'user'
+                        ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(139, 92, 246, 0.45))'
+                        : 'rgba(255,255,255,0.05)',
+                      border: msg.role === 'user'
+                        ? '1px solid rgba(168, 85, 247, 0.3)'
+                        : '1px solid rgba(255,255,255,0.07)',
+                      color: '#fff',
+                      fontSize: '0.88rem',
+                      lineHeight: 1.6,
+                    }}>
+                      {msg.text}
+                    </div>
+                    <p style={{ margin: '4px 0 0', fontSize: '0.62rem', color: 'rgba(255,255,255,0.25)', textAlign: msg.role === 'user' ? 'right' : 'left', paddingLeft: '4px' }}>{msg.ts}</p>
+                  </div>
+                  {msg.role === 'user' && (
+                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #a855f7, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.88rem', color: '#fff', fontWeight: 600, flexShrink: 0, order: 3 }}>S</div>
+                  )}
+                </div>
+              ))}
+              {/* Typing indicator */}
+              {jkTyping && (
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #7c3aed, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.9rem' }}>🐰</div>
+                  <div style={{ padding: '12px 16px', borderRadius: '18px 18px 18px 4px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)', display: 'flex', gap: '4px', alignItems: 'center' }}>
+                    {[0,1,2].map(i => (
+                      <div key={i} style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(168,85,247,0.7)', animation: `pulse-slow ${0.8 + i * 0.2}s ease-in-out infinite`, animationDelay: `${i * 0.15}s` }} />
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Quick action chips */}
+            <div style={{
+              padding: '8px 20px',
+              display: 'flex',
+              gap: '8px',
+              overflowX: 'auto',
+              whiteSpace: 'nowrap',
+              background: 'rgba(0,0,0,0.1)',
+              borderTop: '1px solid rgba(168, 85, 247, 0.08)',
+              scrollbarWidth: 'none',
+              pointerEvents: 'auto'
+            }}>
+              {[
+                { text: "🎵 Sing Still With You", action: "Can you sing Still With You? 💜" },
+                { text: "🎵 Play Euphoria", action: "Can you play Euphoria? ✨" },
+                { text: "📖 Suggest a diary topic", action: "What should I write about in my diary today? 📖" },
+                { text: "🪑 Meditate on the Bench", action: "Let's go sit on the bench. 🪑" }
+              ].map((chip, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleJKChatSend(chip.action)}
+                  className="interactive"
+                  style={{
+                    background: 'rgba(168, 85, 247, 0.12)',
+                    border: '1px solid rgba(168, 85, 247, 0.25)',
+                    borderRadius: '16px',
+                    padding: '6px 14px',
+                    color: '#e9d5ff',
+                    fontSize: '0.72rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    flexShrink: 0
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'rgba(168, 85, 247, 0.25)'; e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.45)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'rgba(168, 85, 247, 0.12)'; e.currentTarget.style.borderColor = 'rgba(168, 85, 247, 0.25)'; }}
+                >
+                  {chip.text}
+                </button>
+              ))}
+            </div>
+
+            {/* Input Area */}
+            <div style={{
+              padding: '16px 20px',
+              borderTop: '1px solid rgba(168, 85, 247, 0.1)',
+              background: 'rgba(0,0,0,0.2)',
+              display: 'flex',
+              gap: '12px',
+              alignItems: 'center'
+            }}>
+              <input
+                type="text"
+                value={chatInput}
+                onChange={e => setChatInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter' && !jkTyping) handleJKChatSend(); }}
+                disabled={jkTyping}
+                placeholder={jkTyping ? "Jungkook is typing..." : "Say something to Jungkook..."}
+                style={{
+                  flex: 1,
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(168,85,247,0.2)',
+                  borderRadius: '24px',
+                  padding: '12px 18px',
+                  color: '#fff',
+                  fontSize: '0.88rem',
+                  outline: 'none',
+                  fontFamily: 'inherit',
+                  transition: 'border-color 0.2s',
+                  opacity: jkTyping ? 0.5 : 1
+                }}
+                onFocus={e => { e.currentTarget.style.borderColor = 'rgba(168,85,247,0.5)'; }}
+                onBlur={e => { e.currentTarget.style.borderColor = 'rgba(168,85,247,0.2)'; }}
+              />
+              <button
+                onClick={() => handleJKChatSend()}
+                disabled={!chatInput.trim() || jkTyping}
+                style={{
+                  width: '44px', height: '44px',
+                  borderRadius: '50%',
+                  background: (chatInput.trim() && !jkTyping) ? 'linear-gradient(135deg, #7c3aed, #a855f7)' : 'rgba(168,85,247,0.1)',
+                  border: '1px solid rgba(168,85,247,0.3)',
+                  color: '#fff',
+                  cursor: (chatInput.trim() && !jkTyping) ? 'pointer' : 'default',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '1rem',
+                  transition: 'all 0.2s',
+                  flexShrink: 0,
+                  boxShadow: chatInput.trim() ? '0 0 12px rgba(168,85,247,0.4)' : 'none'
+                }}
+              >
+                ➤
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Awakening quest removed per user request */}
     </div>
   );
 };

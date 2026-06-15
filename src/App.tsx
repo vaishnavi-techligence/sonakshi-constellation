@@ -7,10 +7,11 @@ import { SonakshiUniverse } from './components/SonakshiUniverse';
 import { LilyTree } from './components/LilyTree';
 import { FinalScene } from './components/FinalScene';
 import { JungkookConstellation } from './components/JungkookConstellation';
+import { IntroVideo } from './components/IntroVideo';
 import './App.css';
 
 function App() {
-  const [stage, setStage] = useState<'landing' | 'garden' | 'jungkook-constellation'>('landing');
+  const [stage, setStage] = useState<'intro' | 'landing' | 'garden' | 'jungkook-constellation'>('intro');
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
   const [unlockedWishes, setUnlockedWishes] = useState<boolean[]>([
@@ -28,7 +29,9 @@ function App() {
     <>
       <MagicCursor />
 
-      {stage === 'jungkook-constellation' ? (
+      {stage === 'intro' ? (
+        <IntroVideo onComplete={() => setStage('landing')} />
+      ) : stage === 'jungkook-constellation' ? (
         <JungkookConstellation
           audioCtx={audioCtx}
           onExit={() => setStage('garden')}

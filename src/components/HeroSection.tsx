@@ -14,16 +14,16 @@ class Butterfly {
   constructor(x: number, y: number) {
     this.x = x;
     this.y = y;
-    this.size = Math.random() * 8 + 6;
-    this.vx = (Math.random() - 0.5) * 1.8;
-    this.vy = -(Math.random() * 1.2 + 0.6);
+    this.size = Math.random() * 5 + 4; // Smaller, more delicate
+    this.vx = (Math.random() - 0.5) * 0.8;
+    this.vy = -(Math.random() * 0.6 + 0.3); // Slower floating
     this.wingAngle = Math.random() * Math.PI;
-    this.wingSpeed = Math.random() * 0.15 + 0.15;
+    this.wingSpeed = Math.random() * 0.1 + 0.08;
     const colors = [
-      'rgba(229, 204, 255, 0.9)', // BTS Purple
-      'rgba(242, 227, 198, 0.9)', // Gold
-      'rgba(208, 240, 255, 0.9)', // Ice blue
-      'rgba(255, 255, 255, 0.95)', // Lily White
+      'rgba(229, 204, 255, 0.7)', // BTS Purple
+      'rgba(242, 227, 198, 0.7)', // Gold
+      'rgba(208, 240, 255, 0.7)', // Ice blue
+      'rgba(255, 255, 255, 0.8)', // Lily White
     ];
     this.color = colors[Math.floor(Math.random() * colors.length)];
     this.alpha = 1.0;
@@ -33,9 +33,9 @@ class Butterfly {
     this.x += this.vx;
     this.y += this.vy;
     this.wingAngle += this.wingSpeed;
-    this.alpha -= 0.008;
+    this.alpha -= 0.002; // Fades out much slower (lasts ~8 seconds)
     // Fluttering drift
-    this.vx += Math.sin(this.y * 0.04) * 0.04;
+    this.vx += Math.sin(this.y * 0.02) * 0.03;
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -158,6 +158,20 @@ export const HeroSection: React.FC = () => {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Ambient butterfly spawner (magical, not overwhelming)
+      if (Math.random() < 0.02) { // roughly 1 butterfly every 1-2 seconds
+        const startX = Math.random() * canvas.width;
+        const startY = canvas.height + 20; // start slightly below screen
+        butterfliesRef.current.push(new Butterfly(startX, startY));
+      }
+
+      // Ambient sparkles near the center lily
+      if (Math.random() < 0.06) {
+        const startX = (canvas.width / 2) + (Math.random() - 0.5) * 500;
+        const startY = (canvas.height * 0.4) + (Math.random() - 0.5) * 500;
+        sparklesRef.current.push(new SparkleParticle(startX, startY));
+      }
 
       // Update & Draw Sparkles
       const sparkles = sparklesRef.current;

@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Custom ignores
+.env
+Text.txt
+*.cjs
+test-*.js
+download-*.js

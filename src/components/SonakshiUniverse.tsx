@@ -235,10 +235,10 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
   }, []);
 
   return (
-    <div className="glass-panel" style={{ padding: '32px', display: 'flex', gap: '32px', alignItems: 'center', width: '100%', maxWidth: '850px', background: 'rgba(20, 15, 35, 0.35)' }}>
+    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(20, 15, 35, 0.5), rgba(10, 8, 20, 0.8))', border: '1px solid rgba(168, 85, 247, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
-        <span style={{ color: 'var(--purple-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>ISLAND I</span>
-        <h3 style={{ margin: '12px 0', fontSize: '1.6rem', color: '#fff' }}>Jungkook Constellation</h3>
+        <span style={{ color: 'var(--purple-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND I</span>
+        <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(168, 85, 247, 0.2)' }}>Jungkook Constellation</h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
           A starry path dedicated to Sonakshi's favorite artist. Hover to light up the rabbit stars, and click the cosmic canvas to trigger music notes and a purple galaxy bloom.
         </p>
@@ -1056,10 +1056,10 @@ const SkatingIsland: React.FC<SkatingIslandProps> = ({ audioCtx, ambientPlaying,
 
 
   return (
-    <div className="glass-panel" style={{ padding: '32px', display: 'flex', gap: '32px', alignItems: 'center', width: '100%', maxWidth: '850px', background: 'rgba(15, 23, 42, 0.35)', flexDirection: 'row-reverse' }}>
+    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(8, 12, 24, 0.8))', border: '1px solid rgba(208, 240, 255, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)', flexDirection: 'row-reverse' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
-        <span style={{ color: 'var(--crystal-blue)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>ISLAND II</span>
-        <h3 style={{ margin: '12px 0', fontSize: '1.6rem', color: '#fff' }}>Partner Skating Crystal Lake</h3>
+        <span style={{ color: 'var(--crystal-blue)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND II</span>
+        <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(208, 240, 255, 0.2)' }}>Partner Skating Crystal Lake</h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
           Move your cursor over the frozen lake. Watch as you and Sonakshi skate hand-in-hand, connected by the red string of fate. Drag your path to play the soundtrack of your journey.
         </p>
@@ -1121,7 +1121,7 @@ const SkatingIsland: React.FC<SkatingIslandProps> = ({ audioCtx, ambientPlaying,
           )}
         </div>
       </div>
-      <div style={{ position: 'relative', border: '1px solid rgba(208, 240, 255, 0.15)', borderRadius: '12px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', border: '1px solid rgba(208, 240, 255, 0.25)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
         {/* Cute Message overlay */}
         {(skatingStarted || isSkatingActive) && (
           <div
@@ -1711,7 +1711,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
   }, [isHovering, mousePos]);
 
   return (
-    <div className="glass-panel" style={{ padding: '32px', display: 'flex', gap: '32px', alignItems: 'center', width: '100%', maxWidth: '850px', background: 'rgba(30, 20, 45, 0.35)' }}>
+    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(30, 20, 45, 0.5), rgba(15, 10, 25, 0.8))', border: '1px solid rgba(249, 115, 22, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
       {showGoalText && createPortal(
         <div
           key={`goal-overlay-${score}`}
@@ -1789,8 +1789,8 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
       )}
 
       <div style={{ flex: 1, textAlign: 'left' }}>
-        <span style={{ color: '#f97316', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>ISLAND III</span>
-        <h3 style={{ margin: '12px 0', fontSize: '1.6rem', color: '#fff' }}>Magical Hoop Dusk</h3>
+        <span style={{ color: '#f97316', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND III</span>
+        <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(249, 115, 22, 0.2)' }}>Magical Hoop Dusk</h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
           Aim with your cursor and click to shoot glowing basketballs from the launch pad. Make the shot into the net to trigger a celebration!
         </p>
@@ -1837,7 +1837,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
         </div>
       </div>
       
-      <div style={{ position: 'relative', border: '1px solid rgba(249, 115, 22, 0.15)', borderRadius: '12px', overflow: 'hidden' }}>
+      <div style={{ position: 'relative', border: '1px solid rgba(249, 115, 22, 0.25)', borderRadius: '16px', overflow: 'hidden', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
         <canvas
           ref={canvasRef}
           width={360}
@@ -1897,10 +1897,10 @@ const CookingIsland: React.FC = () => {
   };
 
   return (
-    <div className="glass-panel" style={{ padding: '32px', display: 'flex', gap: '32px', alignItems: 'center', width: '100%', maxWidth: '850px', background: 'rgba(242, 227, 198, 0.04)', flexDirection: 'row-reverse' }}>
+    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(242, 227, 198, 0.08), rgba(20, 15, 10, 0.6))', border: '1px solid rgba(242, 227, 198, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)', flexDirection: 'row-reverse' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
-        <span style={{ color: 'var(--gold-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>ISLAND IV</span>
-        <h3 style={{ margin: '12px 0', fontSize: '1.6rem', color: '#fff' }}>Floating Recipe Book</h3>
+        <span style={{ color: 'var(--gold-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND IV</span>
+        <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(242, 227, 198, 0.2)' }}>Floating Recipe Book</h3>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
           Open the magic cookbook containing Sonakshi's favorite cozy treats, filled with inside jokes, custom cooking ingredients, and sweet memories. Click to turn pages.
         </p>
@@ -1918,8 +1918,8 @@ const CookingIsland: React.FC = () => {
           height: '320px',
           background: 'linear-gradient(135deg, #fbf7ee 0%, #f3ede0 100%)',
           color: '#38332a',
-          borderRadius: '12px',
-          boxShadow: '0 15px 35px rgba(0,0,0,0.5)',
+          borderRadius: '16px',
+          boxShadow: '0 15px 35px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.8)',
           padding: '24px',
           display: 'flex',
           flexDirection: 'column',
@@ -1979,14 +1979,14 @@ export const SonakshiUniverse: React.FC<SonakshiUniverseProps> = ({ audioCtx, am
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '96px',
+        gap: '120px',
         padding: '120px 24px',
         position: 'relative',
         zIndex: 5
       }}
     >
       <div style={{ textAlign: 'center', maxWidth: '600px', marginBottom: '24px' }}>
-        <h2 style={{ fontSize: '2rem', color: '#fff', marginBottom: '16px' }}>Sonakshi's Universe</h2>
+        <h2 style={{ fontSize: '3rem', color: '#fff', marginBottom: '16px', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 15px rgba(255,255,255,0.1)' }}>Sonakshi's Universe</h2>
         <p style={{ color: 'var(--text-secondary)' }}>
           Explore the twilight paths of her personality. Hover and interact with each island to experience its unique magic.
         </p>

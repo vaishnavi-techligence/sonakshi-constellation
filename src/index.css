@@ -268,3 +268,143 @@ p {
   from { opacity: 1; transform: translateY(0); }
   to { opacity: 0; transform: translateY(20px); }
 }
+
+/* ==========================================
+   MOBILE RESPONSIVE STYLES
+   ========================================== */
+
+/* Touch devices: restore default cursor */
+@media (hover: none) and (pointer: coarse) {
+  html, body { cursor: auto; }
+  .magic-cursor-dot, .magic-cursor-circle { display: none !important; }
+}
+
+/* Tablet & Small Desktop */
+@media (max-width: 1024px) {
+  .garden-section { padding: 60px 20px; }
+
+  .magic-btn {
+    font-size: 0.8rem;
+    padding: 12px 22px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 768px) {
+  html, body { cursor: auto; }
+  .magic-cursor-dot, .magic-cursor-circle { display: none !important; }
+
+  h1 { font-size: 1.8rem !important; letter-spacing: 0.12em !important; }
+  h2 { font-size: 1.4rem !important; }
+  h3 { font-size: 1.1rem !important; }
+
+  .garden-section { padding: 48px 16px; }
+
+  .magic-btn {
+    font-size: 0.75rem;
+    padding: 10px 18px;
+    letter-spacing: 0.12em;
+  }
+
+  .glass-panel {
+    border-radius: 12px;
+  }
+
+  .responsive-glass-panel {
+    flex-direction: column !important;
+    padding: 32px 24px !important;
+    gap: 32px !important;
+  }
+  .responsive-glass-panel > div {
+    width: 100% !important;
+  }
+
+  /* Constellation header section */
+  [style*="fontSize: '2.5rem'"] { font-size: 1.5rem !important; }
+
+  /* Feature sections */
+  [style*="padding: '48px 56px'"] {
+    padding: 28px 18px !important;
+  }
+
+  /* Grid: force single column on mobile */
+  [style*="gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))'"] {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Diary flex layout */
+  [style*="flexWrap: 'wrap'"] {
+    gap: 24px !important;
+  }
+
+  /* Mailbox split border */
+  [style*="borderLeft: '1px solid rgba(255,255,255,0.06)'"] {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid rgba(255,255,255,0.06) !important;
+    padding-top: 24px !important;
+  }
+
+  /* Memory wall cards */
+  [style*="minWidth: '240px'"] {
+    min-width: 180px !important;
+    max-width: 180px !important;
+  }
+
+  /* Video grid on mobile */
+  .video-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Music room vinyl layout */
+  [style*="gap: '40px'"] { gap: 20px !important; }
+
+  /* JK Chat overlay mobile */
+  [style*="maxWidth: '680px'"] {
+    max-width: 100% !important;
+    height: 95vh !important;
+    border-radius: 16px !important;
+  }
+
+  /* Future vision - stack layout */
+  [style*="flex: '0 0 48%'"] {
+    flex: 0 0 100% !important;
+    height: 40vh !important;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+  h1 { font-size: 1.4rem !important; }
+
+  .magic-btn {
+    font-size: 0.7rem;
+    padding: 9px 14px;
+  }
+
+  /* Navigation header */
+  [style*="top: '32px', left: '32px'"] {
+    top: 16px !important;
+    left: 12px !important;
+  }
+
+  /* Constellation stars - adjust positions for narrow screens */
+  [style*="left: '28%'"], [style*="left: '40%'"], [style*="left: '60%'"],
+  [style*="left: '72%'"], [style*="left: '62%'"], [style*="left: '38%'"] {
+    font-size: 0.55rem !important;
+  }
+
+  /* Memory wall scroll */
+  [style*="padding: '40px 60px'"] {
+    padding: 20px 12px !important;
+    gap: 12px !important;
+  }
+}
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
