@@ -408,3 +408,56 @@ p {
   gap: 20px;
 }
 
+/* Future vision - stack layout responsive */
+@media (max-width: 768px) {
+  .future-vision-container {
+    flex-direction: column !important;
+  }
+  
+  .future-vision-image-half {
+    flex: 0 0 45vh !important;
+    height: 45vh !important;
+  }
+  
+  .future-vision-text-half {
+    flex: 1 !important;
+    height: 55vh !important;
+    padding: 30px 24px 30px 24px !important;
+  }
+
+  .future-vision-text-half h2 {
+    font-size: 1.15rem !important;
+  }
+
+  .future-vision-text-half p {
+    font-size: 0.95rem !important;
+    line-height: 1.7 !important;
+  }
+
+  .future-vision-gradient {
+    width: 100% !important;
+    height: 120px !important;
+    top: auto !important;
+    bottom: 0 !important;
+    background: linear-gradient(to bottom, transparent, #030209) !important;
+  }
+  
+  .future-vision-controls {
+    bottom: 24px !important;
+    left: 20px !important;
+  }
+  
+  .future-vision-dots {
+    bottom: 12px !important;
+    left: 20px !important;
+  }
+
+  .future-vision-close {
+    top: 16px !important;
+    right: 16px !important;
+    padding: 6px 12px !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+

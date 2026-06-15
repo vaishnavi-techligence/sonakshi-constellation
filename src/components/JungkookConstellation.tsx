@@ -3453,6 +3453,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
 
               {/* FULLSCREEN SPLIT LAYOUT */}
               <div
+                className="future-vision-container"
                 style={{
                   position: 'absolute',
                   top: 0,
@@ -3466,6 +3467,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               >
                 {/* LEFT HALF — Large image */}
                 <div
+                  className="future-vision-image-half"
                   style={{
                     flex: '0 0 48%',
                     height: '100%',
@@ -3496,14 +3498,14 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                   ))}
 
                   {/* Gradient fade from image into right panel */}
-                  <div style={{
+                  <div className="future-vision-gradient" style={{
                     position: 'absolute', top: 0, right: 0,
                     width: '120px', height: '100%',
                     background: 'linear-gradient(to right, transparent, #030209)'
                   }} />
 
                   {/* Manual Controls */}
-                  <div style={{
+                  <div className="future-vision-controls" style={{
                     position: 'absolute', bottom: '56px', left: '32px',
                     display: 'flex', gap: '12px', alignItems: 'center',
                     zIndex: 60
@@ -3549,7 +3551,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                   </div>
 
                   {/* Bottom overlay — image counter */}
-                  <div style={{
+                  <div className="future-vision-dots" style={{
                     position: 'absolute', bottom: '32px', left: '32px',
                     display: 'flex', gap: '8px', alignItems: 'center'
                   }}>
@@ -3576,6 +3578,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
 
                 {/* RIGHT HALF — Atmospheric description */}
                 <div
+                  className="future-vision-text-half"
                   style={{
                     flex: 1,
                     height: '100%',
@@ -3681,7 +3684,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               {/* Close future vision */}
               <button
                 onClick={closeFutureGift}
-                className="interactive"
+                className="interactive future-vision-close"
                 style={{
                   position: 'absolute',
                   top: '28px',
