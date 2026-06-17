@@ -1129,3 +1129,42 @@ p {
     font-size: 1.6rem !important;
   }
 }
+
+/* Mobile Responsive Fixes Batch 3 */
+@media (max-width: 768px) {
+  /* Push title down so it doesnt block the canvas */
+  .constellation-title-container {
+    margin-top: 50vh !important;
+  }
+  
+  /* Shrink watermelon text */
+  .watermelon-inner-text p {
+    font-size: 0.8rem !important;
+    line-height: 1.2 !important;
+    margin: 4px 0 !important;
+  }
+  .watermelon-inner-text {
+    width: 95% !important;
+  }
+
+  /* Shrink moon text */
+  .moon-text {
+    font-size: 1.5rem !important;
+    white-space: normal !important;
+    padding: 0 20px;
+    text-align: center;
+  }
+
+  /* Polaroid exact size */
+  .vintage-polaroid .media-content {
+    width: 200px !important;
+    height: 200px !important;
+  }
+  
+  /* Bulletproof aspect ratio for Lily Tree */
+  .tree-aspect-ratio {
+    height: 0 !important;
+    padding-bottom: 75% !important; /* 800x600 = 4:3 */
+    overflow: visible;
+  }
+}
