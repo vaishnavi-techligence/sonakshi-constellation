@@ -2211,7 +2211,7 @@ const MemoryLaneIsland: React.FC<MemoryLaneIslandProps> = ({ audioCtx, ambientPl
               return (
                 <div className="vintage-polaroid" key={`g1-${index}`}>
                   {isVideo ? (
-                    <video src={mediaSrc} className="media-content" loop muted playsInline preload="none" controls />
+                    <video src={mediaSrc} className="media-content" autoPlay loop muted playsInline />
                   ) : (
                     <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} loading="lazy" />
                   )}
@@ -2225,7 +2225,7 @@ const MemoryLaneIsland: React.FC<MemoryLaneIslandProps> = ({ audioCtx, ambientPl
               return (
                 <div className="vintage-polaroid" key={`g2-${index}`}>
                   {isVideo ? (
-                    <video src={mediaSrc} className="media-content" loop muted playsInline preload="none" controls />
+                    <video src={mediaSrc} className="media-content" autoPlay loop muted playsInline />
                   ) : (
                     <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} loading="lazy" />
                   )}
