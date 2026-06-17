@@ -2645,7 +2645,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             background: 'radial-gradient(ellipse at center, rgba(5, 3, 10, 0.9) 25%, rgba(5, 3, 10, 0) 70%)',
             borderRadius: '50%'
           }}>
-            <h1 style={{ fontSize: '2.5rem', fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', textShadow: '0 3px 20px rgba(0,0,0,0.9)' }}>
+            <h1 className="responsive-title" style={{ fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', textShadow: '0 3px 20px rgba(0,0,0,0.9)' }}>
               Jungkook Constellation
             </h1>
             <p style={{ color: 'var(--purple-accent)', fontStyle: 'italic', fontSize: '1.1rem', margin: '12px auto 32px', textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
@@ -2692,7 +2692,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           <div id="section-diary" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap' }}>
               {/* Virtual Diary Book */}
-              <div style={{ flex: 1, minWidth: '340px', textAlign: 'left' }}>
+              <div style={{ flex: 1, minWidth: 'min(340px, 100%)', textAlign: 'left' }}>
                 <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE I</span>
                 <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 20px', fontFamily: 'var(--font-serif-display)' }}>Personal Diary to Jungkook</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '24px' }}>
@@ -2765,7 +2765,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               </div>
 
               {/* Mailbox Column */}
-              <div style={{ flex: 1, minWidth: '340px', borderLeft: '1px solid rgba(255,255,255,0.06)', paddingLeft: '48px', textAlign: 'left' }}>
+              <div style={{ flex: 1, minWidth: 'min(340px, 100%)', borderLeft: '1px solid rgba(255,255,255,0.06)', paddingLeft: '48px', textAlign: 'left' }}>
                 <h3 style={{ fontSize: '1.1rem', color: 'var(--purple-accent)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Mail size={16} /> Constellation Mailbox
                 </h3>
@@ -2869,7 +2869,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           {/* FEATURE 2: FUTURE GIFT & BENCH */}
           <div id="section-gift" className="glass-panel" style={{ width: '92%', maxWidth: '1400px', padding: '48px 56px', background: 'rgba(12, 8, 20, 0.65)', border: '1px solid rgba(255,255,255,0.05)', backdropFilter: 'blur(12px)', pointerEvents: 'auto' }}>
             <div style={{ display: 'flex', gap: '48px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <div style={{ flex: 1, minWidth: '340px', textAlign: 'left' }}>
+              <div style={{ flex: 1, minWidth: 'min(340px, 100%)', textAlign: 'left' }}>
                 <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE II</span>
                 <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 20px', fontFamily: 'var(--font-serif-display)' }}>Future Gift & Reflection Bench</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6', marginBottom: '24px' }}>
@@ -2915,7 +2915,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               </div>
 
               {/* Graphic Representation */}
-              <div style={{ flex: 0.8, minWidth: '220px', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ flex: 0.8, minWidth: 'min(220px, 100%)', display: 'flex', justifyContent: 'center' }}>
                 <div
                   style={{
                     width: '160px',
@@ -3133,7 +3133,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             <div style={{ display: 'flex', gap: '40px', flexWrap: 'wrap', alignItems: 'center' }}>
               
               {/* Rotating Vinyl Mock */}
-              <div style={{ flex: 0.8, minWidth: '220px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+              <div style={{ flex: 0.8, minWidth: 'min(220px, 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                 <div
                   style={{
                     width: '180px',
@@ -3178,7 +3178,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               </div>
 
               {/* Tracks List */}
-              <div style={{ flex: 1.2, minWidth: '280px', textAlign: 'left' }}>
+              <div style={{ flex: 1.2, minWidth: 'min(280px, 100%)', textAlign: 'left' }}>
                 <span style={{ color: 'var(--purple-accent)', fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase' }}>FEATURE V</span>
                 <h2 style={{ fontSize: '1.8rem', color: '#fff', margin: '8px 0 12px', fontFamily: 'var(--font-serif-display)' }}>Cosmic Vinyl Player</h2>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '20px' }}>
@@ -3894,7 +3894,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
               className="chat-window-sidebar"
               style={{
                 flex: 1,
-                minWidth: '400px',
+                minWidth: 'min(400px, 100%)',
                 maxWidth: '650px',
                 display: 'flex',
                 flexDirection: 'column',

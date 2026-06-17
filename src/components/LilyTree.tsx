@@ -378,7 +378,7 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
         {/* Dynamic canvas stardust background */}
         <canvas ref={galaxyCanvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
 
-        <div style={{ position: 'relative', width: '100%', maxWidth: '800px', height: '100%', margin: '0 auto' }}>
+        <div className="tree-aspect-ratio" style={{ position: 'relative', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
           {/* Tree SVG */}
           <svg
             viewBox="0 0 800 600"

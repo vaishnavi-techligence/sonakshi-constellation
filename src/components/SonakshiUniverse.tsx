@@ -236,7 +236,7 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
 
   return (
     <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'linear-gradient(145deg, rgba(20, 15, 35, 0.5), rgba(10, 8, 20, 0.8))', borderTop: '1px solid rgba(168, 85, 247, 0.15)', borderBottom: '1px solid rgba(168, 85, 247, 0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
-      <div className="responsive-island-content" style={{ padding: '48px 24px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', margin: '0 auto' }}>
+      <div className="responsive-island-content" style={{ padding: '48px 24px' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
         <span style={{ color: 'var(--purple-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND I</span>
         <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(168, 85, 247, 0.2)' }}>Jungkook Constellation</h3>
@@ -1023,7 +1023,7 @@ const SkatingIsland: React.FC<SkatingIslandProps> = ({ audioCtx, ambientPlaying,
 
   return (
     <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(8, 12, 24, 0.8))', borderTop: '1px solid rgba(208, 240, 255, 0.15)', borderBottom: '1px solid rgba(208, 240, 255, 0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
-      <div className="responsive-island-content" style={{ padding: '48px 24px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', margin: '0 auto', flexDirection: 'row-reverse' }}>
+      <div className="responsive-island-content reverse" style={{ padding: '48px 24px' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
         <span style={{ color: 'var(--crystal-blue)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND II</span>
         <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(208, 240, 255, 0.2)' }}>Partner Skating Crystal Lake</h3>
@@ -1681,7 +1681,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
 
   return (
     <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'linear-gradient(145deg, rgba(30, 20, 45, 0.5), rgba(15, 10, 25, 0.8))', borderTop: '1px solid rgba(249, 115, 22, 0.15)', borderBottom: '1px solid rgba(249, 115, 22, 0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
-      <div className="responsive-island-content" style={{ padding: '48px 24px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', margin: '0 auto' }}>
+      <div className="responsive-island-content" style={{ padding: '48px 24px' }}>
       {showGoalText && createPortal(
         <div
           key={`goal-overlay-${score}`}

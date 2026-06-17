@@ -1090,3 +1090,42 @@ p {
     height: 200px;
   }
 }
+
+/* Responsive Island Content */
+.responsive-island-content {
+  display: flex;
+  gap: 48px;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.responsive-island-content.reverse {
+  flex-direction: row-reverse;
+}
+@media (max-width: 768px) {
+  .responsive-island-content, .responsive-island-content.reverse {
+    flex-direction: column !important;
+    padding: 32px 24px !important;
+    gap: 32px !important;
+  }
+}
+
+.tree-aspect-ratio {
+  height: 100%;
+}
+@media (max-width: 768px) {
+  .tree-aspect-ratio {
+    height: auto;
+    aspect-ratio: 800 / 600;
+  }
+}
+
+.responsive-title {
+  font-size: 2.5rem;
+}
+@media (max-width: 768px) {
+  .responsive-title {
+    font-size: 1.6rem !important;
+  }
+}
