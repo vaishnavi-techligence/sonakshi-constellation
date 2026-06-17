@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, X } from 'lucide-react';
+import { Play, Pause, X } from 'lucide-react';
 
 interface WishData {
   id: number;
@@ -10,6 +10,8 @@ interface WishData {
   polaroidText: string;
   polaroidBg: string;
   voiceNoteChime: number[]; // frequencies to play
+  audioFile?: string; // optional actual audio file
+  authorImage?: string; // optional photo to display beside voice note
 }
 
 interface LilyTreeProps {
@@ -20,13 +22,15 @@ interface LilyTreeProps {
 const wishes: WishData[] = [
   {
     id: 0,
-    author: "Riya & Tanya",
-    relation: "Midnight Callers",
-    message: "Happy Birthday to our favorite human! Through late night vents, cramming for exams, and endless gossip, you've been our constant. Here's to more memories, coffee runs, and laughing till our stomachs hurt! 🤍",
+    author: "Vaish",
+    relation: "Note Form Vaishu",
+    message: "Happy Birthday to my favorite human! Through late night vents, cramming for exams, and endless gossip, you've been my constant. Here's to more memories, coffee runs, and laughing till our stomachs hurt! 🤍",
     polaroidEmoji: "✨🌸👭",
-    polaroidText: "Late Night Talks",
+    polaroidText: "For Ms.Law&Order",
     polaroidBg: "linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)",
-    voiceNoteChime: [261.63, 329.63, 392.00, 523.25] // C maj arpeggio
+    voiceNoteChime: [261.63, 329.63, 392.00, 523.25], // C maj arpeggio
+    audioFile: "/happy bday voice note from vaish.mp4",
+    authorImage: "/Tape/WhatsApp Image 2026-06-17 at 6.26.21 PM.jpeg"
   },
   {
     id: 1,
@@ -77,14 +81,54 @@ const wishes: WishData[] = [
     polaroidText: "Twining Lily Garden",
     polaroidBg: "linear-gradient(135deg, #fcfbfa 0%, #e2dfd3 100%)",
     voiceNoteChime: [329.63, 392.00, 523.25, 659.25] // E min to C arpeggio
+  },
+  {
+    id: 6,
+    author: "Vaibhav",
+    relation: "A Special Bond",
+    message: "Many And Maniest  Happy Returns of the Day Didi!! It's your birthday the special day of your life and I wish that this day goes amazing and full gifts and love I hope God bless you and gives you  all the strength to conquer your problems I am really thankful to you for helping me out in every tough moment for guiding me for making me feel good around you and supporting me a lot and I hope our bind remains the same And I wish you great succes in your career 🎂🎊❤️ Love you ❤️🥳",
+    polaroidEmoji: "🐼🎈❤️",
+    polaroidText: "For My Panda",
+    polaroidBg: "linear-gradient(135deg, #d1fae5 0%, #10b981 100%)",
+    voiceNoteChime: [261.63, 329.63, 392.00, 523.25],
+    authorImage: "/panda.png"
   }
 ];
 
 export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedWishes }) => {
   const [activeWish, setActiveWish] = useState<WishData | null>(null);
   const [playingVoiceNote, setPlayingVoiceNote] = useState<number | null>(null);
+  const [audioDuration, setAudioDuration] = useState<string>("0:04");
   const galaxyCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const realAudioRef = useRef<HTMLAudioElement | null>(null);
   const count = unlockedWishes.filter(Boolean).length;
+  const hasPlayedSurprise = useRef(false);
+
+  useEffect(() => {
+    if (activeWish?.audioFile) {
+      const audio = new Audio(activeWish.audioFile);
+      audio.onloadedmetadata = () => {
+        const mins = Math.floor(audio.duration / 60);
+        const secs = Math.floor(audio.duration % 60);
+        setAudioDuration(`${mins}:${secs.toString().padStart(2, '0')}`);
+      };
+    } else if (activeWish) {
+      const durationMs = activeWish.voiceNoteChime.length * 250 + 1000;
+      const secs = Math.floor(durationMs / 1000);
+      setAudioDuration(`0:${secs.toString().padStart(2, '0')}`);
+    }
+  }, [activeWish]);
+  
+  useEffect(() => {
+    return () => {
+      if (realAudioRef.current) {
+        realAudioRef.current.pause();
+        realAudioRef.current = null;
+      }
+    };
+  }, []);
+
+
 
   // Render reactive galaxy canvas behind the tree
   useEffect(() => {
@@ -169,7 +213,7 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
       });
 
       // Special high speed galaxy particles if fully unlocked
-      if (count === 6 && Math.random() < 0.2) {
+      if (count === 7 && Math.random() < 0.2) {
         sparkles.push({
           x: canvas.width / 2 + (Math.random() - 0.5) * 80,
           y: canvas.height / 2 + (Math.random() - 0.5) * 80,
@@ -208,9 +252,37 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
     setActiveWish(wish);
   };
 
-  const playSynthesizedChime = (chime: number[]) => {
-    if (playingVoiceNote !== null) return;
-    setPlayingVoiceNote(activeWish?.id || 0);
+  const playVoiceNote = (wish: WishData) => {
+    if (playingVoiceNote === wish.id) {
+      // Pause currently playing voice note
+      if (wish.audioFile && realAudioRef.current) {
+        realAudioRef.current.pause();
+      }
+      setPlayingVoiceNote(null);
+      return;
+    }
+
+    if (playingVoiceNote !== null) {
+      if (realAudioRef.current) {
+        realAudioRef.current.pause();
+      }
+    }
+
+    setPlayingVoiceNote(wish.id);
+
+    if (wish.audioFile) {
+      if (realAudioRef.current) {
+        realAudioRef.current.pause();
+      }
+      const audio = new Audio(wish.audioFile);
+      realAudioRef.current = audio;
+      
+      window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { origin: 'lily' } }));
+
+      audio.play().catch(e => console.error("Error playing voice note", e));
+      audio.onended = () => setPlayingVoiceNote(null);
+      return;
+    }
 
     const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
     const ctx = new AudioContextClass();
@@ -227,7 +299,7 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
     delay.connect(master);
 
     // Play chords arpeggio
-    chime.forEach((freq, idx) => {
+    wish.voiceNoteChime.forEach((freq, idx) => {
       const startTime = ctx.currentTime + idx * 0.25;
       const osc = ctx.createOscillator();
       osc.type = 'sine';
@@ -248,17 +320,18 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
 
     setTimeout(() => {
       setPlayingVoiceNote(null);
-    }, chime.length * 250 + 1000);
+    }, wish.voiceNoteChime.length * 250 + 1000);
   };
 
   // Branch bud coordinates on our SVG (relative to 800 x 600 viewbox)
   const budCoords = [
-    { x: 280, y: 340, label: "Midnight Chords" }, // Left lower branch
+    { x: 280, y: 340, label: "Vaishu" }, // Left lower branch
     { x: 520, y: 340, label: "Galaxy Path" },    // Right lower branch
     { x: 230, y: 240, label: "Clutch Hoop" },    // Left upper branch
     { x: 570, y: 240, label: "Cozy Kitchen" },   // Right upper branch
     { x: 340, y: 150, label: "Ice Trails" },     // Center left top
-    { x: 460, y: 150, label: "Secret Lily" }     // Center right top
+    { x: 460, y: 150, label: "Secret Lily" },     // Center right top
+    { x: 400, y: 90, label: "vaibhav" }       // Top center
   ];
 
   return (
@@ -284,139 +357,141 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
           At the heart of the garden stands a tree made of pure starlight and lilies. Touch the glowing buds along the branches to bloom each lily and unlock personal birthday wishes.
         </p>
         <p style={{ color: 'var(--gold-accent)', fontSize: '0.9rem', marginTop: '12px', fontWeight: 500 }}>
-          Lilies Bloomed: {count} of 6
+          Lilies Bloomed: {count} of 7
         </p>
       </div>
 
       {/* Lily Tree Display container */}
       <div
         style={{
-          width: '100%',
-          maxWidth: '850px',
+          width: '100vw',
+          marginLeft: 'calc(-50vw + 50%)',
           height: '600px',
           position: 'relative',
-          borderRadius: '20px',
-          border: '1px solid rgba(255, 255, 255, 0.05)',
           overflow: 'hidden',
           background: 'rgba(5, 5, 12, 0.6)',
           backdropFilter: 'blur(8px)',
-          boxShadow: 'inset 0 0 50px rgba(0,0,0,0.8)'
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
         }}
       >
         {/* Dynamic canvas stardust background */}
         <canvas ref={galaxyCanvasRef} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none' }} />
 
-        {/* Tree SVG */}
-        <svg
-          viewBox="0 0 800 600"
-          style={{
-            width: '100%',
-            height: '100%',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            zIndex: 2,
-            filter: `drop-shadow(0 0 ${10 + count * 5}px rgba(220, 225, 255, ${0.1 + count * 0.12}))`,
-            transition: 'filter 1s ease'
-          }}
-        >
-          {/* Main Trunk & Branches (Starlight paths) */}
-          <path
-            d="M 400,580 C 400,500 380,480 380,420 C 380,360 410,320 410,280 C 410,230 390,210 390,180 C 390,150 400,100 400,90"
-            fill="none"
-            stroke="url(#trunkGrad)"
-            strokeWidth="10"
-            strokeLinecap="round"
-          />
-          {/* Branch 1 Left Lower */}
-          <path d="M 385,410 C 340,390 310,380 280,340" fill="none" stroke="url(#trunkGrad)" strokeWidth="6" strokeLinecap="round" />
-          {/* Branch 2 Right Lower */}
-          <path d="M 400,400 C 460,390 490,380 520,340" fill="none" stroke="url(#trunkGrad)" strokeWidth="6" strokeLinecap="round" />
-          {/* Branch 3 Left Upper */}
-          <path d="M 390,290 C 340,280 280,270 230,240" fill="none" stroke="url(#trunkGrad)" strokeWidth="5" strokeLinecap="round" />
-          {/* Branch 4 Right Upper */}
-          <path d="M 410,270 C 460,260 520,270 570,240" fill="none" stroke="url(#trunkGrad)" strokeWidth="5" strokeLinecap="round" />
-          {/* Branch 5 Left Top */}
-          <path d="M 395,200 C 360,180 350,170 340,150" fill="none" stroke="url(#trunkGrad)" strokeWidth="4" strokeLinecap="round" />
-          {/* Branch 6 Right Top */}
-          <path d="M 405,190 C 440,170 450,170 460,150" fill="none" stroke="url(#trunkGrad)" strokeWidth="4" strokeLinecap="round" />
+        <div style={{ position: 'relative', width: '100%', maxWidth: '800px', height: '100%', margin: '0 auto' }}>
+          {/* Tree SVG */}
+          <svg
+            viewBox="0 0 800 600"
+            preserveAspectRatio="xMidYMid meet"
+            style={{
+              width: '100%',
+              height: '100%',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 2,
+              filter: `drop-shadow(0 0 ${10 + count * 5}px rgba(220, 225, 255, ${0.1 + count * 0.12}))`,
+              transition: 'filter 1s ease'
+            }}
+          >
+            {/* Main Trunk & Branches (Starlight paths) */}
+            <path
+              d="M 400,580 C 400,500 380,480 380,420 C 380,360 410,320 410,280 C 410,230 390,210 390,180 C 390,150 400,100 400,90"
+              fill="none"
+              stroke="url(#trunkGrad)"
+              strokeWidth="10"
+              strokeLinecap="round"
+            />
+            {/* Branch 1 Left Lower */}
+            <path d="M 385,410 C 340,390 310,380 280,340" fill="none" stroke="url(#trunkGrad)" strokeWidth="6" strokeLinecap="round" />
+            {/* Branch 2 Right Lower */}
+            <path d="M 400,400 C 460,390 490,380 520,340" fill="none" stroke="url(#trunkGrad)" strokeWidth="6" strokeLinecap="round" />
+            {/* Branch 3 Left Upper */}
+            <path d="M 390,290 C 340,280 280,270 230,240" fill="none" stroke="url(#trunkGrad)" strokeWidth="5" strokeLinecap="round" />
+            {/* Branch 4 Right Upper */}
+            <path d="M 410,270 C 460,260 520,270 570,240" fill="none" stroke="url(#trunkGrad)" strokeWidth="5" strokeLinecap="round" />
+            {/* Branch 5 Left Top */}
+            <path d="M 395,200 C 360,180 350,170 340,150" fill="none" stroke="url(#trunkGrad)" strokeWidth="4" strokeLinecap="round" />
+            {/* Branch 6 Right Top */}
+            <path d="M 405,190 C 440,170 450,170 460,150" fill="none" stroke="url(#trunkGrad)" strokeWidth="4" strokeLinecap="round" />
 
-          {/* Dynamic SVG Definitions */}
-          <defs>
-            <linearGradient id="trunkGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#1e1b4b" />
-              <stop offset="40%" stopColor="#312e81" />
-              <stop offset="80%" stopColor="#c084fc" />
-              <stop offset="100%" stopColor="#e9eaff" />
-            </linearGradient>
-          </defs>
-        </svg>
+            {/* Dynamic SVG Definitions */}
+            <defs>
+              <linearGradient id="trunkGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stopColor="#1e1b4b" />
+                <stop offset="40%" stopColor="#312e81" />
+                <stop offset="80%" stopColor="#c084fc" />
+                <stop offset="100%" stopColor="#e9eaff" />
+              </linearGradient>
+            </defs>
+          </svg>
 
-        {/* Floating Interactive Buds Overlay */}
-        {budCoords.map((coord, idx) => {
-          const wish = wishes[idx];
-          const isUnlocked = unlockedWishes[wish.id];
+          {/* Floating Interactive Buds Overlay */}
+          {budCoords.map((coord, idx) => {
+            const wish = wishes[idx];
+            const isUnlocked = unlockedWishes[wish.id];
 
-          return (
-            <div
-              key={wish.id}
-              onClick={() => handleBudClick(wish)}
-              className="interactive"
-              style={{
-                position: 'absolute',
-                left: `${(coord.x / 800) * 100}%`,
-                top: `${(coord.y / 600) * 100}%`,
-                transform: 'translate(-50%, -50%)',
-                zIndex: 10,
-                cursor: 'pointer',
-                textAlign: 'center'
-              }}
-            >
-              {/* Blooming / Glowing Visual representation */}
+            return (
               <div
+                key={wish.id}
+                onClick={() => handleBudClick(wish)}
+                className="interactive"
                 style={{
-                  width: isUnlocked ? '36px' : '20px',
-                  height: isUnlocked ? '36px' : '20px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  background: isUnlocked
-                    ? 'radial-gradient(circle, #ffffff 0%, #fefcf3 60%, #e2dfd3 100%)'
-                    : 'radial-gradient(circle, #f2e3c6 0%, rgba(242, 227, 198, 0.4) 60%, transparent 100%)',
-                  boxShadow: isUnlocked
-                    ? '0 0 25px 8px rgba(255,255,255,0.7), 0 0 10px var(--gold-accent)'
-                    : '0 0 15px 4px rgba(242, 227, 198, 0.8), 0 0 3px #fff',
-                  border: isUnlocked ? '2px solid var(--gold-accent)' : '1px solid rgba(255,255,255,0.6)',
-                  transition: 'all 0.8s cubic-bezier(0.19, 1, 0.22, 1)',
-                  transform: isUnlocked ? 'scale(1) rotate(45deg)' : 'scale(1) rotate(0deg)',
-                  animation: !isUnlocked ? 'pulse-slow 2s infinite ease-in-out' : 'none'
+                  position: 'absolute',
+                  left: `${(coord.x / 800) * 100}%`,
+                  top: `${(coord.y / 600) * 100}%`,
+                  transform: 'translate(-50%, -50%)',
+                  zIndex: 10,
+                  cursor: 'pointer',
+                  textAlign: 'center'
                 }}
               >
-                {/* Visual Petals inside bloomed state */}
-                {isUnlocked && (
-                  <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                    <div style={{ position: 'absolute', top: '2px', left: '16px', width: '4px', height: '12px', background: 'var(--gold-accent)', borderRadius: '50%' }} />
-                    <div style={{ position: 'absolute', top: '16px', left: '2px', width: '12px', height: '4px', background: 'var(--gold-accent)', borderRadius: '50%' }} />
-                  </div>
-                )}
+                {/* Blooming / Glowing Visual representation */}
+                <div
+                  style={{
+                    width: isUnlocked ? '36px' : '20px',
+                    height: isUnlocked ? '36px' : '20px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    background: isUnlocked
+                      ? 'radial-gradient(circle, #ffffff 0%, #fefcf3 60%, #e2dfd3 100%)'
+                      : 'radial-gradient(circle, #f2e3c6 0%, rgba(242, 227, 198, 0.4) 60%, transparent 100%)',
+                    boxShadow: isUnlocked
+                      ? '0 0 25px 8px rgba(255,255,255,0.7), 0 0 10px var(--gold-accent)'
+                      : '0 0 15px 4px rgba(242, 227, 198, 0.8), 0 0 3px #fff',
+                    border: isUnlocked ? '2px solid var(--gold-accent)' : '1px solid rgba(255,255,255,0.6)',
+                    transition: 'all 0.8s cubic-bezier(0.19, 1, 0.22, 1)',
+                    transform: isUnlocked ? 'scale(1) rotate(45deg)' : 'scale(1) rotate(0deg)',
+                    animation: !isUnlocked ? 'pulse-slow 2s infinite ease-in-out' : 'none'
+                  }}
+                >
+                  {/* Visual Petals inside bloomed state */}
+                  {isUnlocked && (
+                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                      <div style={{ position: 'absolute', top: '2px', left: '16px', width: '4px', height: '12px', background: 'var(--gold-accent)', borderRadius: '50%' }} />
+                      <div style={{ position: 'absolute', top: '16px', left: '2px', width: '12px', height: '4px', background: 'var(--gold-accent)', borderRadius: '50%' }} />
+                    </div>
+                  )}
+                </div>
+                <p
+                  style={{
+                    color: isUnlocked ? '#fff' : 'var(--text-secondary)',
+                    fontSize: '0.7rem',
+                    letterSpacing: '0.1em',
+                    textTransform: 'uppercase',
+                    marginTop: '8px',
+                    fontWeight: isUnlocked ? 600 : 400,
+                    textShadow: '0 2px 4px rgba(0,0,0,0.8)'
+                  }}
+                >
+                  {coord.label}
+                </p>
               </div>
-              <p
-                style={{
-                  color: isUnlocked ? '#fff' : 'var(--text-secondary)',
-                  fontSize: '0.7rem',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  marginTop: '8px',
-                  fontWeight: isUnlocked ? 600 : 400,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8)'
-                }}
-              >
-                {coord.label}
-              </p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* Wish Details Glassmorphism Modal */}
@@ -488,7 +563,8 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
                   flexDirection: 'column',
                   alignItems: 'center',
                   transform: 'rotate(-3deg)',
-                  border: '1px solid rgba(0,0,0,0.08)'
+                  border: '1px solid rgba(0,0,0,0.08)',
+                  alignSelf: 'center'
                 }}
               >
                 <div
@@ -501,10 +577,15 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
                     justifyContent: 'center',
                     alignItems: 'center',
                     fontSize: '3.5rem',
-                    boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)'
+                    boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)',
+                    overflow: 'hidden'
                   }}
                 >
-                  {activeWish.polaroidEmoji}
+                  {activeWish.authorImage ? (
+                    <img src={activeWish.authorImage} alt={activeWish.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    activeWish.polaroidEmoji
+                  )}
                 </div>
                 <p
                   style={{
@@ -547,7 +628,7 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
                   }}
                 >
                   <button
-                    onClick={() => playSynthesizedChime(activeWish.voiceNoteChime)}
+                    onClick={() => playVoiceNote(activeWish)}
                     className="interactive"
                     style={{
                       width: '36px',
@@ -564,16 +645,7 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
                     }}
                   >
                     {playingVoiceNote === activeWish.id ? (
-                      <div
-                        style={{
-                          width: '12px',
-                          height: '12px',
-                          border: '2px solid #38332a',
-                          borderTop: '2px solid transparent',
-                          borderRadius: '50%',
-                          animation: 'spin-slow 1s linear infinite'
-                        }}
-                      />
+                      <Pause size={16} fill="#38332a" stroke="#38332a" />
                     ) : (
                       <Play size={16} fill="#38332a" stroke="none" style={{ marginLeft: '2px' }} />
                     )}
@@ -597,7 +669,7 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
                       ))}
                     </div>
                   </div>
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>0:04</span>
+                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{audioDuration}</span>
                 </div>
               </div>
             </div>

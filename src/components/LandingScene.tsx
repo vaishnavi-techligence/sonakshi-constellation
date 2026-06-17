@@ -1891,54 +1891,7 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
       )}
 
 
-      {/* BRANDING TITLE OVERLAY */}
-      {!secretTriggered && (
-        <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '52%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            pointerEvents: 'none',
-            zIndex: 9997,
-            animation: 'fade-in 2.5s ease-out forwards',
-            background: 'radial-gradient(ellipse at center, rgba(5, 5, 15, 0.9) 0%, rgba(5, 5, 15, 0.5) 45%, transparent 75%)',
-            padding: '60px 120px',
-            width: '100%',
-            maxWidth: '1000px'
-          }}
-        >
-          <h1
-            style={{
-              fontFamily: 'var(--font-serif-text)',
-              fontSize: '3.2rem',
-              fontWeight: 400,
-              color: '#ffffff',
-              letterSpacing: '0.15em',
-              textTransform: 'uppercase',
-              textShadow: '0 4px 30px rgba(0, 0, 0, 1), 0 0 20px rgba(255, 255, 255, 0.3)'
-            }}
-          >
-            Sonakshi's Lily Garden
-          </h1>
-          <p
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '1.15rem',
-              fontWeight: 700,
-              color: '#fffdf5',
-              letterSpacing: '0.45em',
-              textTransform: 'uppercase',
-              marginTop: '16px',
-              opacity: 1.0,
-              textShadow: '0 3px 15px rgba(0, 0, 0, 1), 0 0 15px rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            A Universe As Beautiful As You
-          </p>
-        </div>
-      )}
+
 
       {/* MUSIC TOGGLE BUTTON IN CORNER */}
       <div

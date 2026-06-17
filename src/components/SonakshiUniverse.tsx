@@ -235,7 +235,8 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
   }, []);
 
   return (
-    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(20, 15, 35, 0.5), rgba(10, 8, 20, 0.8))', border: '1px solid rgba(168, 85, 247, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+    <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'linear-gradient(145deg, rgba(20, 15, 35, 0.5), rgba(10, 8, 20, 0.8))', borderTop: '1px solid rgba(168, 85, 247, 0.15)', borderBottom: '1px solid rgba(168, 85, 247, 0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+      <div className="responsive-island-content" style={{ padding: '48px 24px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
         <span style={{ color: 'var(--purple-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND I</span>
         <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(168, 85, 247, 0.2)' }}>Jungkook Constellation</h3>
@@ -248,36 +249,6 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
         
         {/* Actions Button Group */}
         <div style={{ marginTop: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button
-            onClick={togglePlay}
-            className="magic-btn interactive"
-            style={{
-              background: isPlaying
-                ? 'linear-gradient(135deg, rgba(168, 85, 247, 0.25), rgba(244, 114, 182, 0.2))'
-                : 'linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(244, 114, 182, 0.15))',
-              border: isPlaying
-                ? '1px solid rgba(244, 114, 182, 0.5)'
-                : '1px solid rgba(168, 85, 247, 0.4)',
-              boxShadow: isPlaying
-                ? '0 0 15px rgba(244, 114, 182, 0.3)'
-                : 'var(--glass-shadow)',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 20px',
-              fontSize: '0.75rem'
-            }}
-          >
-            {isPlaying ? (
-              <>
-                <span className="pulse-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f472b6', display: 'inline-block' }} />
-                Stop Song
-              </>
-            ) : (
-              'Play Still With You 💜'
-            )}
-          </button>
 
           <button
             onClick={onEnterJungkookConstellation}
@@ -299,12 +270,6 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
           </button>
         </div>
           
-          {isPlaying && (
-            <p className="animate-fade-in" style={{ fontSize: '0.75rem', color: '#d8b4fe', fontStyle: 'italic', fontFamily: 'var(--font-serif-text)' }}>
-              Playing: Jungkook - Still With You... 💜
-            </p>
-          )}
-
           {canvasClicked && !isPlaying && (
             <p className="animate-fade-in" style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               Tap canvas to spawn galaxy stars & music notes 🐰
@@ -320,6 +285,7 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
           className="interactive"
           style={{ display: 'block', background: '#080512', cursor: 'crosshair' }}
         />
+      </div>
       </div>
     </div>
   );
@@ -1056,7 +1022,8 @@ const SkatingIsland: React.FC<SkatingIslandProps> = ({ audioCtx, ambientPlaying,
 
 
   return (
-    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(8, 12, 24, 0.8))', border: '1px solid rgba(208, 240, 255, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)', flexDirection: 'row-reverse' }}>
+    <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(8, 12, 24, 0.8))', borderTop: '1px solid rgba(208, 240, 255, 0.15)', borderBottom: '1px solid rgba(208, 240, 255, 0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+      <div className="responsive-island-content" style={{ padding: '48px 24px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', margin: '0 auto', flexDirection: 'row-reverse' }}>
       <div style={{ flex: 1, textAlign: 'left' }}>
         <span style={{ color: 'var(--crystal-blue)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND II</span>
         <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(208, 240, 255, 0.2)' }}>Partner Skating Crystal Lake</h3>
@@ -1194,6 +1161,7 @@ const SkatingIsland: React.FC<SkatingIslandProps> = ({ audioCtx, ambientPlaying,
           style={{ display: 'block', background: '#0a0f1d', cursor: 'none' }}
         />
       </div>
+      </div>
     </div>
   );
 };
@@ -1284,7 +1252,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
   // Sync the latest goal handler to avoid stale closures in animate
   onGoalScoredRef.current = () => {
     setScore(s => {
-      const newScore = s + 1;
+      const newScore = s >= 3 ? 1 : s + 1;
       
       // Goal celebration triggers ONLY at the 3rd goal milestone
       if (newScore === 3) {
@@ -1333,6 +1301,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
               }
               setShowGoalText(false);
               setIsFadingOut(false);
+              setScore(0);
               if (wasAmbientPlaying.current) {
                 setAmbientPlaying(true);
               }
@@ -1711,7 +1680,8 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
   }, [isHovering, mousePos]);
 
   return (
-    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(30, 20, 45, 0.5), rgba(15, 10, 25, 0.8))', border: '1px solid rgba(249, 115, 22, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+    <div style={{ width: '100vw', marginLeft: 'calc(-50vw + 50%)', background: 'linear-gradient(145deg, rgba(30, 20, 45, 0.5), rgba(15, 10, 25, 0.8))', borderTop: '1px solid rgba(249, 115, 22, 0.15)', borderBottom: '1px solid rgba(249, 115, 22, 0.15)', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)' }}>
+      <div className="responsive-island-content" style={{ padding: '48px 24px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', margin: '0 auto' }}>
       {showGoalText && createPortal(
         <div
           key={`goal-overlay-${score}`}
@@ -1749,7 +1719,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
             }}
           >
             <TypingText
-              text="That's the basketball champian we all know"
+              text="That's the basketball champion we all know"
               delay={400}
               speed={85}
               style={{
@@ -1849,6 +1819,7 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
           className="interactive"
           style={{ display: 'block', background: '#131024', cursor: 'crosshair' }}
         />
+      </div>
       </div>
     </div>
   );
@@ -2015,10 +1986,253 @@ const WatermelonIsland: React.FC<WatermelonIslandProps> = ({ ambientPlaying, set
           TWINKLING WATERMELON
         </h3>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', margin: 0 }}>
-          Some memories taste like summer forever.
+          Viva La Vida, Watermelon Sugar!
         </p>
         <div style={{ height: '20px', marginTop: '8px' }}>
           {!isAwakened && <span style={{fontSize: '0.8rem', opacity: 0.5, letterSpacing: '0.05em'}}>Click the watermelon to awaken it.</span>}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ==========================================
+// ISLAND 5: MEMORY LANE (VINTAGE TAPE)
+// ==========================================
+const tapeMedia = [
+  "IMG-20250323-WA0112.jpg",
+  "IMG_20250323_164218.jpg",
+  "IMG_20250323_171200.jpg",
+  "Sylus.mp4",
+  "VID-20250323-WA0011.mp4",
+  "VID_20250622_052346_938.mp4",
+  "WhatsApp Image 2025-03-23 at 22.58.20_f3643cc4.jpg",
+  "WhatsApp Image 2026-06-17 at 6.24.29 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.24.38 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.24.56 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.25.07 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.25.52 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.26.21 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.27.42 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.28.47 PM.jpeg",
+  "WhatsApp Image 2026-06-17 at 6.38.03 PM.jpeg"
+];
+
+interface MemoryLaneIslandProps {
+  audioCtx: AudioContext | null;
+  ambientPlaying: boolean;
+  setAmbientPlaying: (playing: boolean) => void;
+}
+
+const MemoryLaneIsland: React.FC<MemoryLaneIslandProps> = ({ audioCtx, ambientPlaying, setAmbientPlaying }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const wasAmbientPlaying = useRef(false);
+  const fadeIntervalRef = useRef<any | null>(null);
+  const sourceConnected = useRef(false);
+
+  useEffect(() => {
+    const handleStopAll = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && customEvent.detail.origin !== 'memory') {
+        if (fadeIntervalRef.current) {
+          clearInterval(fadeIntervalRef.current);
+          fadeIntervalRef.current = null;
+        }
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.volume = 1;
+        }
+        setIsPlaying(false);
+      }
+    };
+    window.addEventListener('stop-all-audio', handleStopAll);
+    return () => {
+      window.removeEventListener('stop-all-audio', handleStopAll);
+      if (fadeIntervalRef.current) {
+        clearInterval(fadeIntervalRef.current);
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const togglePlay = () => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+
+    if (isPlaying) {
+      setIsPlaying(false);
+      if (audioRef.current) {
+        let vol = audioRef.current.volume;
+        fadeIntervalRef.current = setInterval(() => {
+          if (vol > 0.05) {
+            vol -= 0.05;
+            if (audioRef.current) audioRef.current.volume = vol;
+          } else {
+            if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.volume = 1;
+            }
+            if (wasAmbientPlaying.current) {
+              setAmbientPlaying(true);
+            }
+          }
+        }, 100);
+      } else {
+        if (wasAmbientPlaying.current) {
+          setAmbientPlaying(true);
+        }
+      }
+    } else {
+      if (!audioRef.current) {
+        const audio = new Audio('/slipping.mp4');
+        audio.preload = 'auto';
+        audio.addEventListener('ended', () => {
+          setIsPlaying(false);
+          if (wasAmbientPlaying.current) {
+            setAmbientPlaying(true);
+          }
+        });
+        audioRef.current = audio;
+      }
+
+      if (audioCtx && audioRef.current && !sourceConnected.current) {
+        try {
+          const source = audioCtx.createMediaElementSource(audioRef.current);
+          const gainNode = audioCtx.createGain();
+          gainNode.gain.value = 2.5; // Boost volume by 250%
+          source.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          sourceConnected.current = true;
+        } catch (e) {
+          console.error("Audio routing error:", e);
+        }
+      }
+
+      window.dispatchEvent(new CustomEvent('stop-all-audio', { detail: { origin: 'memory' } }));
+
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      wasAmbientPlaying.current = ambientPlaying;
+      if (ambientPlaying) {
+        setAmbientPlaying(false);
+      }
+      
+      setIsPlaying(true);
+      audioRef.current.volume = 0;
+      audioRef.current.play().then(() => {
+        let vol = 0;
+        fadeIntervalRef.current = setInterval(() => {
+          if (vol < 0.95) {
+            vol += 0.05;
+            if (audioRef.current) audioRef.current.volume = vol;
+          } else {
+            if (audioRef.current) audioRef.current.volume = 1;
+            if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
+          }
+        }, 100);
+      }).catch(err => {
+        console.error('Failed to play slipping song:', err);
+      });
+    }
+  };
+
+  const handleBgVideoEnded = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.currentTarget;
+    video.currentTime = 4;
+    video.play();
+  };
+
+  return (
+    <div className="memory-lane-island" style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Background Flashback Video */}
+      <video 
+        src="/Tape/My therapy.mp4#t=4"
+        autoPlay 
+        muted 
+        playsInline 
+        onEnded={handleBgVideoEnded}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          opacity: 0.5,
+          filter: 'sepia(0.6) blur(1px) contrast(1.1)',
+          zIndex: 0,
+          pointerEvents: 'none',
+          mixBlendMode: 'screen'
+        }}
+      />
+
+      <div style={{ textAlign: 'center', marginBottom: '40px', zIndex: 20, position: 'relative' }}>
+        <span style={{ color: '#d4c5b0', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND V</span>
+        <h3 style={{ margin: '12px 0 12px', fontSize: '2.5rem', color: '#f5eadd', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.05em', textShadow: '0 2px 10px rgba(0, 0, 0, 0.8)' }}>
+          Memory Lane
+        </h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontStyle: 'italic', margin: 0, textShadow: '0 1px 5px rgba(0,0,0,0.8)' }}>
+          A vintage reel of golden moments.
+        </p>
+      </div>
+
+      <div className="vintage-film-container">
+        {/* Grain and Sepia Overlays */}
+        <div className="film-grain"></div>
+        <div className="sepia-overlay"></div>
+
+        {/* Tape Cassette Detail */}
+        <div className={`tape-cassette-detail ${isPlaying ? 'playing' : ''}`} onClick={togglePlay} style={{ cursor: 'pointer' }} title="Click to play tape">
+          <div className="tape-label">
+            <div className="tape-stripes"></div>
+            <span className="tape-title">Summer '96</span>
+          </div>
+          <div className="bridge"></div>
+        </div>
+        {isPlaying && (
+          <div className="projector-flicker" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(255,255,255,0.03)', pointerEvents: 'none', zIndex: 15 }}></div>
+        )}
+
+        {/* Film Strip Photos */}
+        <div className="film-strip-wrapper">
+          <div className={`film-strip-track ${isPlaying ? 'playing' : ''}`}>
+            {/* Group 1 */}
+            {tapeMedia.map((filename, index) => {
+              const isVideo = filename.endsWith('.mp4');
+              const mediaSrc = `/Tape/${filename}${filename === 'Sylus.mp4' ? '#t=5' : ''}`;
+              return (
+                <div className="vintage-polaroid" key={`g1-${index}`}>
+                  {isVideo ? (
+                    <video src={mediaSrc} className="media-content" autoPlay loop muted playsInline />
+                  ) : (
+                    <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} />
+                  )}
+                </div>
+              );
+            })}
+            {/* Group 2 for seamless looping */}
+            {tapeMedia.map((filename, index) => {
+              const isVideo = filename.endsWith('.mp4');
+              const mediaSrc = `/Tape/${filename}${filename === 'Sylus.mp4' ? '#t=5' : ''}`;
+              return (
+                <div className="vintage-polaroid" key={`g2-${index}`}>
+                  {isVideo ? (
+                    <video src={mediaSrc} className="media-content" autoPlay loop muted playsInline />
+                  ) : (
+                    <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -2071,6 +2285,7 @@ export const SonakshiUniverse: React.FC<SonakshiUniverseProps> = ({ audioCtx, am
         setAmbientPlaying={setAmbientPlaying} 
       />
       <WatermelonIsland ambientPlaying={ambientPlaying} setAmbientPlaying={setAmbientPlaying} />
+      <MemoryLaneIsland audioCtx={audioCtx} ambientPlaying={ambientPlaying} setAmbientPlaying={setAmbientPlaying} />
     </div>
   );
 };

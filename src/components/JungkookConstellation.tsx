@@ -108,7 +108,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       try {
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({
-          model: "gemini-1.5-flash",
+          model: "gemini-2.5-flash",
           systemInstruction: "You are Jungkook from BTS. You are talking to Sonakshi on her birthday. You are warm, comforting, slightly playful, and deeply caring. Use emojis like 🐰, 💜, and ✨ appropriately. Respond directly to Sonakshi. IMPORTANT: Do NOT constantly mention the 'Secret Lily Garden' or her birthday in every message. Act natural, casual, and conversational (1-3 sentences ideally), just like a real person texting on c.ai."
         });
         chatSessionRef.current = model.startChat({
@@ -130,6 +130,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
   // Active audio node ref for Still With You play
   const stillWithYouAudioRef = useRef<HTMLAudioElement | null>(null);
   const benchAudioRef = useRef<HTMLAudioElement | null>(null);
+  const blueAndGreyAudioRef = useRef<HTMLAudioElement | null>(null); // Background music
   const recordRotationIntervalRef = useRef<any>(null);
   const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; alpha: number; size: number; color: string }[]>([]);
   const hoverStarTooltipRef = useRef<{ x: number; y: number; text: string } | null>(null);
@@ -182,6 +183,9 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     stopVinylPlay();
     if (benchAudioRef.current) {
       benchAudioRef.current.pause();
+    }
+    if (blueAndGreyAudioRef.current) {
+      blueAndGreyAudioRef.current.pause();
     }
   };
 
@@ -438,9 +442,20 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     }
     firefliesRef.current = tempFireflies;
 
+    // Start Blue and Grey background music
+    const bgAudio = new Audio('/blue_and_grey.webm');
+    bgAudio.loop = true;
+    bgAudio.volume = 0.35;
+    blueAndGreyAudioRef.current = bgAudio;
+    bgAudio.play().catch(e => console.log('Bg audio autoplay prevented:', e));
+
     return () => {
       if (stillWithYouAudioRef.current) stillWithYouAudioRef.current.pause();
       if (benchAudioRef.current) benchAudioRef.current.pause();
+      if (blueAndGreyAudioRef.current) {
+        blueAndGreyAudioRef.current.pause();
+        blueAndGreyAudioRef.current.src = '';
+      }
       if (recordRotationIntervalRef.current) clearInterval(recordRotationIntervalRef.current);
     };
   }, []);
@@ -584,6 +599,10 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     if (musicRoomSynth) {
       musicRoomSynth.stop();
       setMusicRoomSynth(null);
+    }
+    
+    if (blueAndGreyAudioRef.current) {
+      blueAndGreyAudioRef.current.pause();
     }
 
     const audio = new Audio(`/music/${songName}.mp3`);
@@ -1399,24 +1418,31 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     }
   }, [chatMessages, jkTyping]);
 
-  // Fetch real-time Jungkook images from Reddit for the Infinite Wall
+  // Load local images for the Infinite Wall
   useEffect(() => {
-    fetch('/api/reddit/r/btspics/search.json?q=jungkook&restrict_sr=1&sort=new&limit=100')
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.data && data.data.children) {
-          const posts = data.data.children;
-          const images = posts
-            .map((p: any) => ({
-              id: p.data.id,
-              url: p.data.url,
-              title: p.data.title
-            }))
-            .filter((p: any) => p.url && (p.url.endsWith('.jpg') || p.url.endsWith('.png')));
-          setRedditImages(images);
-        }
-      })
-      .catch(err => console.log('Failed to fetch reddit images', err));
+    const localImages = [
+      "1.gif",
+      "2.jpg",
+      "3.jpg",
+      "4.jpg",
+      "5.jpg",
+      "6.jpg",
+      "@ Jk_.jpg",
+      "JUNGKOOK.jpg",
+      "Jungkook at the Hublot After Party ✨️.jpg",
+      "Jungkook icon arirang tour.jpg",
+      "My Husband💖Jeon Jungkook💖_💕_.jpg",
+      "ˏˋ @vensooya ˎˊ˗ __ © 𝙘𝙧𝙚𝙙𝙞𝙩 𝙩𝙤 𝙤𝙬𝙣𝙚𝙧 !.jpg",
+      "⋆ ୨୧ ⋆.jpg",
+      "𖹭(1).jpg",
+      "𖹭.jpg"
+    ].map((filename, i) => ({
+      id: `local-${i}`,
+      url: `/JK infinite photo/${filename}`,
+      title: filename.replace(/\.[a-zA-Z0-9]+$/, '')
+    }));
+    
+    setRedditImages(localImages);
   }, []);
 
   const scrapbookItems = useMemo(() => {
@@ -1504,6 +1530,9 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     // Stop previous bench audio if any, then play the peaceful bench song
     if (benchAudioRef.current) {
       benchAudioRef.current.pause();
+    }
+    if (blueAndGreyAudioRef.current) {
+      blueAndGreyAudioRef.current.pause();
     }
     const benchAudio = new Audio('/2u.webm');
     benchAudio.loop = true;
@@ -1858,6 +1887,9 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       benchAudioRef.current.pause();
       benchAudioRef.current = null;
     }
+    if (blueAndGreyAudioRef.current) {
+      blueAndGreyAudioRef.current.pause();
+    }
     const orchestralAudio = new Audio('/cant_help_falling.webm');
     orchestralAudio.volume = 0.5;
     orchestralAudio.currentTime = 38; // skip to main swell at ~38s
@@ -2182,12 +2214,12 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     }
 
     const musicMap: Record<string, { file: string, vol: number }> = {
-      rainy: { file: '/ambient/rain_roof.ogg', vol: 0.35 },
-      fireplace: { file: '/ambient/fire.ogg', vol: 0.4 },
-      golden: { file: '/ambient/birds.ogg', vol: 0.25 },
-      cosmic: { file: '/ambient/crickets.ogg', vol: 0.4 },
-      starry: { file: '/ambient/waves.ogg', vol: 0.25 },
-      cherry: { file: '/ambient/stream.ogg', vol: 0.3 }
+      rainy: { file: '/ambient/rain_roof.mp3', vol: 0.35 },
+      fireplace: { file: '/ambient/fire.mp3', vol: 0.4 },
+      golden: { file: '/ambient/birds.mp3', vol: 0.25 },
+      cosmic: { file: '/ambient/crickets.mp3', vol: 0.4 },
+      starry: { file: '/ambient/waves.mp3', vol: 0.25 },
+      cherry: { file: '/ambient/stream.mp3', vol: 0.3 }
     };
 
     const track = musicMap[key];
@@ -2197,6 +2229,9 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       audio.volume = track.vol;
       audio.play().then(() => {
         setAmbientAudioPlaying(true);
+        if (blueAndGreyAudioRef.current) {
+          blueAndGreyAudioRef.current.pause();
+        }
       }).catch(e => console.log("Weather ambient play failed", e));
       weatherAudioRef.current = audio;
     } else {
@@ -2340,7 +2375,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           </button>
         ))}
         <button
-          onClick={(e) => {
+            onClick={(e) => {
               e.stopPropagation();
               if (weatherAudioRef.current) {
                 if (ambientAudioPlaying) {
@@ -2349,7 +2384,12 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                 } else {
                   weatherAudioRef.current.play().catch(() => {});
                   setAmbientAudioPlaying(true);
+                  if (blueAndGreyAudioRef.current) {
+                    blueAndGreyAudioRef.current.pause();
+                  }
                 }
+              } else {
+                handleWeatherChange(activeWeatherKey);
               }
             }}
             className="interactive"
@@ -2370,6 +2410,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
   return (
     <div
       onScroll={handleScroll}
+      onMouseMove={handleCanvasMouseMove}
       onClick={(e) => {
         if (e.target === e.currentTarget || (e.target as HTMLElement).tagName.toLowerCase() === 'section') {
           handleCanvasClick(e);
@@ -2392,8 +2433,6 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
       {/* Background Interactive canvas */}
       <canvas
         ref={mainCanvasRef}
-        onMouseMove={handleCanvasMouseMove}
-        onClick={handleCanvasClick}
         style={{
           position: 'fixed',
           top: 0,
@@ -2401,7 +2440,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
           width: '100vw',
           height: '100vh',
           zIndex: 1,
-          pointerEvents: 'auto'
+          pointerEvents: 'none'
         }}
       />
 

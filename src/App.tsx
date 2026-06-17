@@ -15,7 +15,7 @@ function App() {
   const [musicPlaying, setMusicPlaying] = useState(false);
   const [audioCtx, setAudioCtx] = useState<AudioContext | null>(null);
   const [unlockedWishes, setUnlockedWishes] = useState<boolean[]>([
-    false, false, false, false, false, false
+    false, false, false, false, false, false, false
   ]);
 
   useEffect(() => {

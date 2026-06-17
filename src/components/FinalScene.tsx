@@ -491,11 +491,43 @@ export const FinalScene: React.FC = () => {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            pointerEvents: 'auto'
+            pointerEvents: 'auto',
+            overflow: 'hidden'
           }}
         >
+          {/* YouTube Video Background Flashback */}
+          <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            width: '100vw',
+            height: '100vh',
+            transform: 'translate(-50%, -50%)',
+            overflow: 'hidden',
+            zIndex: 0,
+            opacity: 0.6,
+            pointerEvents: 'none'
+          }}>
+            <iframe 
+              src="https://www.youtube.com/embed/JyHaRCMbx6A?autoplay=1&mute=0&controls=0&showinfo=0&rel=0&loop=1&playlist=JyHaRCMbx6A&modestbranding=1" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                width: '100vw',
+                minWidth: '177.77vh',
+                height: '100vh',
+                minHeight: '56.25vw',
+                transform: 'translate(-50%, -50%)',
+                border: 'none',
+                pointerEvents: 'none'
+              }}
+            />
+          </div>
+
           {/* Subtle tiny sparkles on dark backdrop */}
-          <div style={{ opacity: 0.35, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+          <div style={{ zIndex: 1, opacity: 0.35, position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
             {[10, 20, 30, 45, 55, 75, 80, 90].map((left, idx) => (
               <div
                 key={idx}
