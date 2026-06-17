@@ -3588,7 +3588,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        objectFit: 'contain',
+                        objectFit: 'cover',
                         objectPosition: imgIdx === 8 ? 'center top' : 'center',
                         opacity: currentGiftImageIndex === imgIdx ? 1 : 0,
                         transition: 'opacity 2.5s ease-in-out',

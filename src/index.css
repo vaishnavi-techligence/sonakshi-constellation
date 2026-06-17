@@ -762,13 +762,22 @@ p {
 }
 
 @media (max-width: 768px) {
+  .lily-tree-container {
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+    max-height: 600px;
+  }
   .watermelon-wrapper {
-    width: 240px;
-    height: 300px;
+    width: 50vw;
+    max-width: 240px;
+    height: 62.5vw;
+    max-height: 300px;
   }
   .watermelon-skin {
-    width: 240px;
-    height: 300px;
+    width: 50vw;
+    max-width: 240px;
+    height: 62.5vw;
+    max-height: 300px;
   }
   .golden-vines { display: none; }
 }

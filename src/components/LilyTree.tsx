@@ -363,10 +363,10 @@ export const LilyTree: React.FC<LilyTreeProps> = ({ unlockedWishes, setUnlockedW
 
       {/* Lily Tree Display container */}
       <div
+        className="lily-tree-container"
         style={{
           width: '100vw',
           marginLeft: 'calc(-50vw + 50%)',
-          height: '600px',
           position: 'relative',
           overflow: 'hidden',
           background: 'rgba(5, 5, 12, 0.6)',

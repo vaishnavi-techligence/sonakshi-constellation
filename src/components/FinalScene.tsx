@@ -146,6 +146,34 @@ export const FinalScene: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const lanternsRef = useRef<SkyLantern[]>([]);
   const waterLiliesRef = useRef<WaterLily[]>([]);
+  const playerRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!finalFaded) return;
+
+    const initPlayer = () => {
+      playerRef.current = new (window as any).YT.Player('suga-piano-player', {
+        events: {
+          'onStateChange': (event: any) => {
+            if (event.data === (window as any).YT.PlayerState.ENDED) {
+              window.location.reload();
+            }
+          }
+        }
+      });
+    };
+
+    if (!(window as any).YT) {
+      const tag = document.createElement('script');
+      tag.src = "https://www.youtube.com/iframe_api";
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
+      
+      (window as any).onYouTubeIframeAPIReady = initPlayer;
+    } else {
+      initPlayer();
+    }
+  }, [finalFaded]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -506,10 +534,11 @@ export const FinalScene: React.FC = () => {
             overflow: 'hidden',
             zIndex: 0,
             opacity: 0.6,
-            pointerEvents: 'none'
+            pointerEvents: 'none' // The iframe API will still trigger events even if pointer events are none
           }}>
             <iframe 
-              src="https://www.youtube.com/embed/JyHaRCMbx6A?autoplay=1&mute=0&controls=0&showinfo=0&rel=0&loop=1&playlist=JyHaRCMbx6A&modestbranding=1" 
+              id="suga-piano-player"
+              src="https://www.youtube.com/embed/JyHaRCMbx6A?autoplay=1&mute=0&controls=0&showinfo=0&rel=0&enablejsapi=1&modestbranding=1" 
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               style={{
                 position: 'absolute',
