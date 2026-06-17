@@ -461,3 +461,364 @@ p {
 }
 
 
+
+@keyframes float-up-butterfly {
+  0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+  10% { opacity: 0.7; }
+  50% { transform: translateY(-50vh) rotate(15deg) scale(1.1); }
+  90% { opacity: 0.7; }
+  100% { transform: translateY(-110vh) rotate(-15deg) scale(1); opacity: 0; }
+}
+
+/* ==========================================
+   ISLAND IV: THE CONSTELLATION WATERMELON
+   ========================================== */
+
+.watermelon-container {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.watermelon-wrapper {
+  position: relative;
+  width: 320px;
+  height: 400px; /* Slightly oblong */
+  cursor: pointer;
+  animation: watermelon-float 8s ease-in-out infinite;
+  z-index: 20;
+}
+
+/* Hanging Golden Vines */
+.golden-vines {
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 200px;
+  background-image: 
+    radial-gradient(circle at 50% 100%, transparent 40px, rgba(255, 215, 0, 0.4) 41px, transparent 43px),
+    radial-gradient(circle at 10% 80%, transparent 20px, rgba(255, 215, 0, 0.3) 21px, transparent 23px);
+  filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Stem */
+.watermelon-stem {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 40px;
+  background: #3e2723;
+  border-radius: 10px 10px 0 0;
+  box-shadow: inset -2px 0 4px rgba(0,0,0,0.5);
+  z-index: 25;
+  transition: transform 3s ease-in-out;
+}
+
+/* Tag */
+.watermelon-tag {
+  position: absolute;
+  top: 10px;
+  left: 55%;
+  width: 120px;
+  height: 40px;
+  background: #fbf7ee;
+  border: 1px solid #d4c5b0;
+  border-radius: 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: var(--font-serif-text);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: #554f42;
+  box-shadow: 2px 4px 10px rgba(0,0,0,0.3);
+  transform-origin: top left;
+  animation: tag-swing 4s ease-in-out infinite alternate;
+  z-index: 26;
+  transition: transform 3s ease-in-out;
+}
+.watermelon-tag::before {
+  content: '';
+  position: absolute;
+  top: -10px; left: 10px;
+  width: 2px; height: 10px;
+  background: #d4c5b0;
+}
+
+/* The Core (Pink glowing juicy inside) */
+.watermelon-core {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  width: 96%;
+  height: 96%;
+  border-radius: 45% 45% 50% 50% / 50% 50% 45% 45%;
+  background: radial-gradient(circle at 50% 40%, #ff4d6d 0%, #c9184a 60%, #800f2f 100%);
+  box-shadow: 0 0 60px rgba(255, 77, 109, 0.8), inset 0 0 40px rgba(255, 255, 255, 0.4);
+  z-index: 10;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: all 3s ease-in-out;
+}
+
+/* Rind Halves */
+.watermelon-rind {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  z-index: 20;
+  transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.watermelon-rind.top {
+  top: 0;
+  transform-origin: bottom center;
+}
+
+.watermelon-rind.bottom {
+  bottom: 0;
+  transform-origin: top center;
+}
+
+/* The visual skin */
+.watermelon-skin {
+  position: absolute;
+  left: 0;
+  width: 320px;
+  height: 400px;
+  border-radius: 45% 45% 50% 50% / 50% 50% 45% 45%;
+  background-color: #06402b;
+  background-image: 
+    repeating-linear-gradient(
+      15deg,
+      transparent,
+      transparent 30px,
+      rgba(20, 90, 50, 0.9) 30px,
+      rgba(20, 90, 50, 0.9) 60px
+    ),
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), transparent 50%);
+  box-shadow: inset 20px 20px 40px rgba(255, 255, 255, 0.2), inset -20px -20px 60px rgba(0, 0, 0, 0.8);
+  overflow: hidden;
+  transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+.watermelon-rind.top .watermelon-skin {
+  top: 0;
+}
+.watermelon-rind.bottom .watermelon-skin {
+  bottom: 0;
+}
+
+/* Constellation Stars in Rind */
+.watermelon-skin::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: inherit;
+  background-image: radial-gradient(circle, #fff 1px, transparent 1px);
+  background-size: 35px 35px;
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Hover effect */
+.watermelon-wrapper:hover .watermelon-skin {
+  filter: brightness(1.15);
+}
+
+/* Awakened State (Split open) */
+.watermelon-wrapper.awakened .watermelon-rind.top {
+  transform: translateY(-130px) rotate(-8deg);
+}
+.watermelon-wrapper.awakened .watermelon-stem {
+  transform: translateX(-50%) translateY(-130px) rotate(-8deg);
+}
+.watermelon-wrapper.awakened .watermelon-tag {
+  transform: translateY(-130px) rotate(-8deg);
+}
+.watermelon-wrapper.awakened .watermelon-rind.bottom {
+  transform: translateY(110px) rotate(5deg);
+}
+.watermelon-wrapper.awakened .watermelon-core {
+  opacity: 1;
+  transform: scale(1);
+  box-shadow: 0 0 150px rgba(255, 77, 109, 1), inset 0 0 40px rgba(255, 255, 255, 0.6);
+  animation: core-pulse 4s infinite alternate;
+}
+
+/* Orbiting Leaves */
+.orbiting-leaves {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 400px; height: 400px;
+  margin-left: -200px; margin-top: -200px;
+  pointer-events: none;
+  z-index: 25;
+  animation: orbit-spin 20s linear infinite;
+}
+.leaf {
+  position: absolute;
+  width: 20px; height: 10px;
+  background: #a3e635;
+  border-radius: 0 100% 0 100%;
+  box-shadow: 0 0 10px rgba(163, 230, 53, 0.6);
+}
+.leaf-1 { top: 10%; left: 50%; transform: rotate(45deg); }
+.leaf-2 { top: 80%; left: 20%; transform: rotate(120deg); }
+.leaf-3 { top: 40%; left: 80%; transform: rotate(-30deg); }
+
+/* Sparks and Environment */
+.island-awakened {
+  transition: all 3s ease-in-out;
+  background: radial-gradient(circle at center, rgba(255, 77, 109, 0.15) 0%, transparent 70%) !important;
+}
+
+@keyframes watermelon-float {
+  0%, 100% { transform: translateY(-10px); }
+  50% { transform: translateY(-25px); }
+}
+
+@keyframes tag-swing {
+  0% { transform: rotate(-5deg); }
+  100% { transform: rotate(15deg); }
+}
+
+@keyframes orbit-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes core-pulse {
+  0% { filter: brightness(1); }
+  100% { filter: brightness(1.3); }
+}
+
+@keyframes seed-drift {
+  0% { transform: translate(-50%, -50%) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) rotate(var(--rot)); opacity: 0; }
+}
+
+.watermelon-seed {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 12px; height: 18px;
+  background: #111;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: 0 0 10px rgba(255, 100, 150, 0.6), inset 2px 2px 4px rgba(255,255,255,0.2);
+  cursor: pointer;
+  z-index: 30;
+  opacity: 0;
+  transition: transform 0.2s;
+  pointer-events: auto;
+}
+
+.watermelon-seed.drifting {
+  animation: seed-drift 15s linear forwards;
+}
+
+.watermelon-seed:hover {
+  transform: translate(-50%, -50%) scale(1.5) !important;
+  box-shadow: 0 0 20px rgba(255, 100, 150, 1), inset 2px 2px 4px rgba(255,255,255,0.4);
+}
+
+.seed-tooltip {
+  position: absolute;
+  bottom: 150%; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 15, 30, 0.95);
+  border: 1px solid rgba(255, 100, 150, 0.4);
+  padding: 10px 18px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  font-family: var(--font-serif-text);
+  font-style: italic;
+  letter-spacing: 0.05em;
+  z-index: 40;
+}
+
+.watermelon-seed:hover .seed-tooltip {
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  .watermelon-wrapper {
+    width: 240px;
+    height: 300px;
+  }
+  .watermelon-skin {
+    width: 240px;
+    height: 300px;
+  }
+  .golden-vines { display: none; }
+}
+
+/* Flashback Video overlay */
+.watermelon-flashback-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  animation: flashback-fade-in 6s ease-in-out forwards 1s;
+  filter: sepia(0.5) hue-rotate(-30deg) saturate(1.5) blur(2px) contrast(1.2);
+  mix-blend-mode: screen;
+}
+
+@keyframes flashback-fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 0.35; }
+}
+
+.watermelon-inner-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  text-align: center;
+  color: #fffdf5;
+  font-family: var(--font-serif-text);
+  font-size: 1.1rem;
+  line-height: 1.45;
+  font-style: italic;
+  font-weight: 700;
+  text-shadow: 
+    0 0 5px #fff,
+    0 0 15px #ffb3c6,
+    0 0 25px #ff4d6d,
+    0 0 40px #ff4d6d;
+  opacity: 0;
+  animation: text-fade-in 2s ease-in-out forwards 2.5s;
+  z-index: 15;
+  pointer-events: none;
+}
+
+@keyframes text-fade-in {
+  0% { opacity: 0; transform: translate(-50%, -45%); }
+  100% { opacity: 1; transform: translate(-50%, -50%); }
+}

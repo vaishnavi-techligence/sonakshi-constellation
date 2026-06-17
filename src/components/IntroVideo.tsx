@@ -71,7 +71,7 @@ export const IntroVideo: React.FC<IntroVideoProps> = ({ onComplete }) => {
         style={{
           width: '100%',
           height: '100%',
-          objectFit: 'cover',
+          objectFit: 'contain',
           opacity: started ? 1 : 0,
           transition: 'opacity 1s ease-in'
         }}

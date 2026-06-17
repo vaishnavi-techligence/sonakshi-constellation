@@ -105,17 +105,21 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
   useEffect(() => {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     if (apiKey) {
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-2.5-flash",
-        systemInstruction: "You are Jungkook from BTS. You are talking to Sonakshi on her birthday. You are warm, comforting, slightly playful, and deeply caring. Use emojis like 🐰, 💜, and ✨ appropriately. Respond directly to Sonakshi. IMPORTANT: Do NOT constantly mention the 'Secret Lily Garden' or her birthday in every message. Act natural, casual, and conversational (1-3 sentences ideally), just like a real person texting on c.ai."
-      });
-      chatSessionRef.current = model.startChat({
-        history: [
-          { role: "user", parts: [{ text: "Hello Jungkook." }] },
-          { role: "model", parts: [{ text: "Hey... you came. I wasn't sure if you would. 🐰" }] },
-        ]
-      });
+      try {
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({
+          model: "gemini-1.5-flash",
+          systemInstruction: "You are Jungkook from BTS. You are talking to Sonakshi on her birthday. You are warm, comforting, slightly playful, and deeply caring. Use emojis like 🐰, 💜, and ✨ appropriately. Respond directly to Sonakshi. IMPORTANT: Do NOT constantly mention the 'Secret Lily Garden' or her birthday in every message. Act natural, casual, and conversational (1-3 sentences ideally), just like a real person texting on c.ai."
+        });
+        chatSessionRef.current = model.startChat({
+          history: [
+            { role: "user", parts: [{ text: "Hello Jungkook." }] },
+            { role: "model", parts: [{ text: "Hey... you came. I wasn't sure if you would. 🐰" }] },
+          ]
+        });
+      } catch (err) {
+        console.error("Failed to initialize Gemini:", err);
+      }
     }
   }, []);
 
@@ -1444,6 +1448,17 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
     }
     return mixed;
   }, [redditImages]);
+
+  const benchFireflies = useMemo(() => {
+    return [...Array(15)].map((_, i) => ({
+      id: i,
+      size: `${2 + Math.random() * 3}px`,
+      left: `${10 + Math.random() * 80}%`,
+      animationDur: `${15 + Math.random() * 15}s`,
+      animationDelay: `${Math.random() * 10}s`,
+      pulseDur: `${2 + Math.random() * 3}s`,
+    }));
+  }, []);
 
   // Diary saving
   const handleSaveDiary = () => {
@@ -3334,6 +3349,54 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', cursor: 'default', pointerEvents: 'none' }}
           />
 
+          <style>
+            {`
+              @keyframes float-up-firefly {
+                0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+                20% { opacity: 0.8; }
+                50% { transform: translate(30px, -50vh) scale(1.2); }
+                80% { opacity: 0.8; }
+                100% { transform: translate(-30px, -110vh) scale(0.8); opacity: 0; }
+              }
+              @keyframes firefly-pulse {
+                0%, 100% { filter: brightness(1) drop-shadow(0 0 4px rgba(242, 227, 198, 0.4)); }
+                50% { filter: brightness(1.5) drop-shadow(0 0 10px rgba(242, 227, 198, 1)); }
+              }
+            `}
+          </style>
+
+          {/* Floating Fireflies */}
+          {benchFireflies.map((f) => (
+            <div
+              key={f.id}
+              style={{
+                position: 'absolute',
+                width: f.size,
+                height: f.size,
+                left: f.left,
+                bottom: '-10%',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(242, 227, 198, 0.95)',
+                animation: `float-up-firefly ${f.animationDur} linear infinite`,
+                animationDelay: f.animationDelay,
+                opacity: 0.8,
+                zIndex: 150,
+                pointerEvents: 'none',
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '50%',
+                  backgroundColor: '#f2e3c6',
+                  animation: `firefly-pulse ${f.pulseDur} ease-in-out infinite alternate`,
+                  animationDelay: f.animationDelay,
+                }}
+              />
+            </div>
+          ))}
+
           {/* Auto-popping motivating text */}
           {benchMotivatingText && (
             <div
@@ -3486,7 +3549,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        objectFit: 'cover',
+                        objectFit: 'contain',
                         objectPosition: imgIdx === 8 ? 'center top' : 'center',
                         opacity: currentGiftImageIndex === imgIdx ? 1 : 0,
                         transition: 'opacity 2.5s ease-in-out',

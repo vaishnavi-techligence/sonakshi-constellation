@@ -1855,108 +1855,170 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
 };
 
 // ==========================================
-// ISLAND 4: COOKING RECIPE BOOK
+// ISLAND 4: MAGICAL WATERMELON
 // ==========================================
-const CookingIsland: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState(0);
-  const recipes = [
-    {
-      title: '🥞 Magic Pancakes',
-      illustration: '🥞',
-      ingredients: [
-        '1 cup of pure happiness',
-        '2 spoons of sweet laughter',
-        '1 pinch of secret lily magic'
-      ],
-      instructions: 'Whisk together during cozy Sunday mornings. Top with butter and high hopes. Best shared while laughing.'
-    },
-    {
-      title: '🧁 Perfect Cupcakes',
-      illustration: '🧁',
-      ingredients: [
-        'A double dose of chocolate frosting',
-        '3 drops of warm late-night talks',
-        'Generous handfuls of stardust'
-      ],
-      instructions: 'Bake at twilight. Pipe frosting in spiral patterns. Perfect accompaniment to venting sessions and binging shows.'
-    },
-    {
-      title: '🍪 Secret Cookie Tax',
-      illustration: '🍪',
-      ingredients: [
-        'Warm melted brown sugar',
-        'Crispy vanilla edges',
-        'Sonakshi standard tax (50%)'
-      ],
-      instructions: 'Any cookie baked must pay a direct tax to Sonakshi before consumption. Violation results in playful complaints.'
-    }
-  ];
+interface WatermelonIslandProps {
+  ambientPlaying: boolean;
+  setAmbientPlaying: (playing: boolean) => void;
+}
 
-  const handleNextPage = () => {
-    setCurrentPage((p) => (p + 1) % recipes.length);
+const WatermelonIsland: React.FC<WatermelonIslandProps> = ({ ambientPlaying, setAmbientPlaying }) => {
+  const [isAwakened, setIsAwakened] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  
+  const handleAwaken = () => {
+    if (fadeIntervalRef.current) {
+      clearInterval(fadeIntervalRef.current);
+      fadeIntervalRef.current = null;
+    }
+
+    if (isAwakened) {
+      setIsAwakened(false);
+      if (audioRef.current) {
+        let vol = audioRef.current.volume;
+        fadeIntervalRef.current = setInterval(() => {
+          if (vol > 0.05) {
+            vol -= 0.05;
+            if (audioRef.current) audioRef.current.volume = vol;
+          } else {
+            if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
+            if (audioRef.current) {
+              audioRef.current.pause();
+              audioRef.current.volume = 0;
+            }
+          }
+        }, 150);
+      }
+      return;
+    }
+    setIsAwakened(true);
+    
+    // Stop ambient if it's playing
+    if (ambientPlaying) {
+      setAmbientPlaying(false);
+    }
+    
+    // Play the song
+    if (audioRef.current) {
+      audioRef.current.volume = 0;
+      audioRef.current.play().then(() => {
+        // Fade in
+        let vol = 0;
+        fadeIntervalRef.current = setInterval(() => {
+          if (vol < 0.8) {
+            vol += 0.05;
+            if (audioRef.current) audioRef.current.volume = vol;
+          } else {
+            if (fadeIntervalRef.current) clearInterval(fadeIntervalRef.current);
+          }
+        }, 150);
+      }).catch(e => console.log('Audio play failed:', e));
+    }
   };
+  
+  // Create sparks for the click
+  const [sparks, setSparks] = useState<{id: number, left: string, top: string, anim: string}[]>([]);
+  useEffect(() => {
+    if (isAwakened) {
+      const newSparks = [...Array(40)].map((_, i) => {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 100 + Math.random() * 200;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        return {
+          id: i,
+          left: '50%',
+          top: '50%',
+          anim: `spark-burst-${i} 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards`,
+          tx: `${tx}px`,
+          ty: `${ty}px`
+        };
+      });
+      setSparks(newSparks);
+    }
+  }, [isAwakened]);
+
 
   return (
-    <div className="glass-panel responsive-glass-panel" style={{ padding: '48px 40px', display: 'flex', gap: '48px', alignItems: 'center', width: '100%', maxWidth: '900px', background: 'linear-gradient(145deg, rgba(242, 227, 198, 0.08), rgba(20, 15, 10, 0.6))', border: '1px solid rgba(242, 227, 198, 0.15)', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05)', flexDirection: 'row-reverse' }}>
-      <div style={{ flex: 1, textAlign: 'left' }}>
-        <span style={{ color: 'var(--gold-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND IV</span>
-        <h3 style={{ margin: '12px 0 16px', fontSize: '2.2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(242, 227, 198, 0.2)' }}>Floating Recipe Book</h3>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '20px' }}>
-          Open the magic cookbook containing Sonakshi's favorite cozy treats, filled with inside jokes, custom cooking ingredients, and sweet memories. Click to turn pages.
-        </p>
-        <button onClick={handleNextPage} className="magic-btn interactive" style={{ padding: '10px 20px', fontSize: '0.75rem' }}>
-          Turn Page ➔
-        </button>
-      </div>
+    <div className={`watermelon-container ${isAwakened ? 'island-awakened' : ''}`} style={{ padding: '60px 20px', width: '100%' }}>
+      
+      {/* Invisible Audio Element */}
+      <audio ref={audioRef} src="/Shining.mp3" loop />
+      
+      {/* Flashback Video */}
+      {isAwakened && (
+        <video 
+          src="/music/videoplayback.mp4" 
+          autoPlay 
+          muted 
+          loop 
+          playsInline
+          className="watermelon-flashback-video"
+        />
+      )}
+      
+      <style>
+        {`
+          ${sparks.map(s => `
+            @keyframes ${s.anim.split(' ')[0]} {
+              0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+              100% { transform: translate(calc(-50% + ${s.tx}), calc(-50% + ${s.ty})) scale(0); opacity: 0; }
+            }
+          `).join('\\n')}
+        `}
+      </style>
 
-      {/* Stylized Book Container */}
-      <div
-        onClick={handleNextPage}
-        className="interactive"
-        style={{
-          width: '360px',
-          height: '320px',
-          background: 'linear-gradient(135deg, #fbf7ee 0%, #f3ede0 100%)',
-          color: '#38332a',
-          borderRadius: '16px',
-          boxShadow: '0 15px 35px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.8)',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          cursor: 'pointer',
-          borderLeft: '8px solid #c2b59b',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'transform 0.4s ease',
-        }}
+      {/* The Hero Object */}
+      <div 
+        className={`watermelon-wrapper ${isAwakened ? 'awakened' : ''}`}
+        onClick={handleAwaken}
       >
-        {/* Subtle page lines */}
-        <div style={{ position: 'absolute', top: 0, right: '50%', width: '1px', height: '100%', background: 'rgba(0,0,0,0.05)', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }} />
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h4 style={{ fontFamily: 'var(--font-serif-display)', color: '#4a4437', fontSize: '1.1rem', margin: 0 }}>
-            {recipes[currentPage].title}
-          </h4>
-          <span style={{ fontSize: '2rem' }}>{recipes[currentPage].illustration}</span>
+        <div className="golden-vines" />
+        <div className="watermelon-core">
+          {isAwakened && (
+            <div className="watermelon-inner-text">
+              <p>In your life someone will recommend you to watch "Twinkling Watermelon".</p>
+              <p style={{marginTop: '12px'}}>It's really important to listen to them.</p>
+            </div>
+          )}
+        </div>
+        <div className="watermelon-rind top"><div className="watermelon-skin" /></div>
+        <div className="watermelon-rind bottom"><div className="watermelon-skin" /></div>
+        <div className="watermelon-stem" />
+        <div className="watermelon-tag">To Sonakshi</div>
+        
+        <div className="orbiting-leaves">
+          <div className="leaf leaf-1" />
+          <div className="leaf leaf-2" />
+          <div className="leaf leaf-3" />
         </div>
 
-        <div style={{ flex: 1, margin: '16px 0', textAlign: 'left' }}>
-          <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#665f50', margin: '0 0 6px' }}>Ingredients:</p>
-          <ul style={{ paddingLeft: '16px', fontSize: '0.8rem', color: '#554f42', marginBottom: '12px' }}>
-            {recipes[currentPage].ingredients.map((ing, i) => (
-              <li key={i} style={{ marginBottom: '2px' }}>{ing}</li>
-            ))}
-          </ul>
-          <p style={{ fontSize: '0.8rem', fontWeight: 600, color: '#665f50', margin: '0 0 4px' }}>Directions:</p>
-          <p style={{ fontSize: '0.78rem', color: '#554f42', lineHeight: '1.4' }}>
-            {recipes[currentPage].instructions}
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#998d75', borderTop: '1px solid rgba(0,0,0,0.06)', paddingTop: '8px' }}>
-          <span>Cozy Cookbook</span>
-          <span>Page {currentPage + 1} of {recipes.length}</span>
+        {isAwakened && <div className="watermelon-shockwave fire" />}
+      </div>
+      
+      {/* Sparks */}
+      {sparks.map(s => (
+        <div key={s.id} style={{
+          position: 'absolute', left: s.left, top: s.top, 
+          width: '6px', height: '6px', background: '#fff', borderRadius: '50%',
+          boxShadow: '0 0 10px rgba(255, 100, 150, 0.9)',
+          animation: s.anim, pointerEvents: 'none', zIndex: 10
+        }} />
+      ))}
+      
+      
+      
+      <div style={{ textAlign: 'center', marginTop: '120px', zIndex: 10 }}>
+        <span style={{ color: 'var(--gold-accent)', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', fontWeight: 600 }}>ISLAND IV</span>
+        <h3 style={{ margin: '12px 0 12px', fontSize: '2rem', color: '#fff', fontFamily: 'var(--font-serif-display)', letterSpacing: '0.02em', textShadow: '0 2px 10px rgba(255, 100, 150, 0.2)' }}>
+          TWINKLING WATERMELON
+        </h3>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', fontStyle: 'italic', margin: 0 }}>
+          Some memories taste like summer forever.
+        </p>
+        <div style={{ height: '20px', marginTop: '8px' }}>
+          {!isAwakened && <span style={{fontSize: '0.8rem', opacity: 0.5, letterSpacing: '0.05em'}}>Click the watermelon to awaken it.</span>}
         </div>
       </div>
     </div>
@@ -2008,7 +2070,7 @@ export const SonakshiUniverse: React.FC<SonakshiUniverseProps> = ({ audioCtx, am
         ambientPlaying={ambientPlaying} 
         setAmbientPlaying={setAmbientPlaying} 
       />
-      <CookingIsland />
+      <WatermelonIsland ambientPlaying={ambientPlaying} setAmbientPlaying={setAmbientPlaying} />
     </div>
   );
 };

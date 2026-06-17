@@ -1890,41 +1890,14 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
         </div>
       )}
 
-      {/* INSTRUCTION OVERLAY */}
-      {!secretTriggered && (
-        <div
-          style={{
-            position: 'absolute',
-            left: '50%',
-            top: '42%',
-            transform: 'translate(-50%, -50%)',
-            textAlign: 'center',
-            pointerEvents: 'none',
-            zIndex: 9998,
-            animation: 'fade-in 3.5s ease-out forwards',
-            opacity: 0.7
-          }}
-        >
-          <p style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.8rem',
-            color: '#e9d5ff',
-            letterSpacing: '0.35em',
-            textTransform: 'uppercase',
-            textShadow: '0 0 12px rgba(168, 85, 247, 0.9)'
-          }}>
-            Tap the moon
-          </p>
-        </div>
-      )}
-  
+
       {/* BRANDING TITLE OVERLAY */}
       {!secretTriggered && (
         <div
           style={{
             position: 'absolute',
             left: '50%',
-            top: '68%',
+            top: '52%',
             transform: 'translate(-50%, -50%)',
             textAlign: 'center',
             pointerEvents: 'none',
@@ -1938,11 +1911,11 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
         >
           <h1
             style={{
-              fontFamily: 'var(--font-serif-display)',
-              fontSize: '2.8rem',
-              fontWeight: 700,
+              fontFamily: 'var(--font-serif-text)',
+              fontSize: '3.2rem',
+              fontWeight: 400,
               color: '#ffffff',
-              letterSpacing: '0.28em',
+              letterSpacing: '0.15em',
               textTransform: 'uppercase',
               textShadow: '0 4px 30px rgba(0, 0, 0, 1), 0 0 20px rgba(255, 255, 255, 0.3)'
             }}
