@@ -473,6 +473,13 @@ export const LandingScene: React.FC<LandingSceneProps> = ({ onComplete, startMus
       { x: 0.15, y: 0.62 }, // Left midground
       { x: 0.85, y: 0.60 }, // Right midground
       { x: 0.22, y: 0.76 }, // Left foreground
+      { x: 0.78, y: 0.74 }, // Right foreground
+      { x: 0.08, y: 0.88 }, // Left far foreground
+      { x: 0.90, y: 0.86 }, // Right far foreground
+      { x: 0.28, y: 0.82 }, // Left foreground inner (focal point special lily)
+      { x: 0.72, y: 0.80 }  // Right foreground inner
+    ];
+
     lilySpans.forEach((span, index) => {
       const isSpecial = index === 6; // left foreground inner
       const sizeFactor = (span.y - 0.42) / 0.58; // 0 near horizon, 1 at bottom
