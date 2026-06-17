@@ -761,6 +761,10 @@ p {
   opacity: 1;
 }
 
+.lily-tree-container {
+  height: 600px;
+}
+
 @media (max-width: 768px) {
   .lily-tree-container {
     height: auto !important;
