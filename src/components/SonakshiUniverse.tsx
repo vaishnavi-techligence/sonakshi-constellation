@@ -1865,7 +1865,7 @@ interface WatermelonIslandProps {
 const WatermelonIsland: React.FC<WatermelonIslandProps> = ({ ambientPlaying, setAmbientPlaying }) => {
   const [isAwakened, setIsAwakened] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const fadeIntervalRef = useRef<any | null>(null);
   
   const handleAwaken = () => {
     if (fadeIntervalRef.current) {
@@ -1918,7 +1918,7 @@ const WatermelonIsland: React.FC<WatermelonIslandProps> = ({ ambientPlaying, set
   };
   
   // Create sparks for the click
-  const [sparks, setSparks] = useState<{id: number, left: string, top: string, anim: string}[]>([]);
+  const [sparks, setSparks] = useState<{id: number, left: string, top: string, anim: string, tx: string, ty: string}[]>([]);
   useEffect(() => {
     if (isAwakened) {
       const newSparks = [...Array(40)].map((_, i) => {
