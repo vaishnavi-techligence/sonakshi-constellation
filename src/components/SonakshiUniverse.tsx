@@ -50,7 +50,7 @@ const JungkookIsland: React.FC<JungkookIslandProps> = ({ audioCtx, ambientPlayin
     } else {
       if (!audioRef.current) {
         const audio = new Audio('/still_with_you.webm');
-        audio.preload = 'auto';
+        audio.preload = 'none';
         audio.addEventListener('ended', () => {
           setIsPlaying(false);
           if (wasAmbientPlaying.current) {
@@ -406,7 +406,7 @@ const SkatingIsland: React.FC<SkatingIslandProps> = ({ audioCtx, ambientPlaying,
       // Warm up / preload the audio element instantly on user click gesture!
       if (!audioRef.current) {
         const audio = new Audio('/drag_path.m4a');
-        audio.preload = 'auto';
+        audio.preload = 'none';
 
         audio.addEventListener('ended', () => {
           setIsSkatingActive(false);
@@ -1319,9 +1319,9 @@ const BasketballIsland: React.FC<BasketballIslandProps> = ({ audioCtx, ambientPl
   };
 
   useEffect(() => {
-    // Preload audio
+    // Preload audio removed for optimization
     const audio = new Audio('/killswitch_lullaby.webm');
-    audio.preload = 'auto';
+    audio.preload = 'none';
     audio.addEventListener('ended', () => {
       setShowGoalText(false);
       setIsFadingOut(false);
@@ -2092,7 +2092,7 @@ const MemoryLaneIsland: React.FC<MemoryLaneIslandProps> = ({ audioCtx, ambientPl
     } else {
       if (!audioRef.current) {
         const audio = new Audio('/slipping.mp4');
-        audio.preload = 'auto';
+        audio.preload = 'none';
         audio.addEventListener('ended', () => {
           setIsPlaying(false);
           if (wasAmbientPlaying.current) {
@@ -2211,9 +2211,9 @@ const MemoryLaneIsland: React.FC<MemoryLaneIslandProps> = ({ audioCtx, ambientPl
               return (
                 <div className="vintage-polaroid" key={`g1-${index}`}>
                   {isVideo ? (
-                    <video src={mediaSrc} className="media-content" autoPlay loop muted playsInline />
+                    <video src={mediaSrc} className="media-content" loop muted playsInline preload="none" controls />
                   ) : (
-                    <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} />
+                    <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} loading="lazy" />
                   )}
                 </div>
               );
@@ -2225,9 +2225,9 @@ const MemoryLaneIsland: React.FC<MemoryLaneIslandProps> = ({ audioCtx, ambientPl
               return (
                 <div className="vintage-polaroid" key={`g2-${index}`}>
                   {isVideo ? (
-                    <video src={mediaSrc} className="media-content" autoPlay loop muted playsInline />
+                    <video src={mediaSrc} className="media-content" loop muted playsInline preload="none" controls />
                   ) : (
-                    <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} />
+                    <img src={mediaSrc} className="media-content" alt={`Memory ${index}`} loading="lazy" />
                   )}
                 </div>
               );

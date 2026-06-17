@@ -3008,7 +3008,7 @@ export const JungkookConstellation: React.FC<JungkookConstellationProps> = ({ au
                     <>
                       <div style={{ height: '160px', background: 'linear-gradient(135deg, #1e0b36 0%, #05030d 100%)', borderRadius: '4px', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2.8rem', border: '1px solid rgba(255,255,255,0.03)', overflow: 'hidden' }}>
                         {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <img src={item.imageUrl} alt={item.title} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         ) : (
                           item.emoji
                         )}
